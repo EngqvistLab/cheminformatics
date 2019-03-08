@@ -1,1 +1,1 @@
-Folder containing processed data, output files, figures etc.
+Folder containing output files, figures etc.
