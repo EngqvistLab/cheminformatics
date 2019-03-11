@@ -57,7 +57,7 @@ Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs
 Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
 Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
 Run pipeline on all of BRENDA -- **Not started** \
-Use visualization tools to explore data -- **Not started** \
+Use visualization tools to explore data -- **Not started**
 
 
 Resources for RDKit
@@ -79,31 +79,31 @@ Getting started: https://www.rdkit.org/docs/GettingStartedInPython.html
 Some starting data
 -----------
 
-Names: \
+**Names:** \
 2-hydroxydodecanoate \
 (S)-lactate \
 2-hydroxypalmitate \
-Glycolate \
+Glycolate
 
 
-Difficult names: \
+**Difficult names:** \
 DL-2-hydroxy-4-methylmercaptobutyrate \
-an (S)-2-hydroxy carboxylate \
+an (S)-2-hydroxy carboxylate
 
 
-Smiles: \
+**Smiles:** \
 [O-]C(=O)C(O)CCCCCCCCCC \
 C[C@@H](C(=O)[O-])O \
 CCCCCCCCCCCCCCC(C(=O)[O-])O \
-C(C(=O)[O-])O \
+C(C(=O)[O-])O
 
 
-InChi: \
+**InChi:** \
 InChI=1S/C12H24O3/c1-2-3-4-5-6-7-8-9-10-11(13)12(14)15/h11,13H,2-10H2,1H3,(H,14,15)/p-1 \
 InChI=1S/C3H6O3/c1-2(4)3(5)6/h2,4H,1H3,(H,5,6)/p-1/t2-/m0/s1 \
 InChI=1S/C16H32O3/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15(17)16(18)19/h15,17H,2-14H2,1H3,(H,18,19)/p-1 \
-InChI=1S/C2H4O3/c3-1-2(4)5/h3H,1H2,(H,4,5)/p-1 \
+InChI=1S/C2H4O3/c3-1-2(4)5/h3H,1H2,(H,4,5)/p-1
 
 
-Fingerprints: \
-??? \
+**Fingerprints:** \
+???
