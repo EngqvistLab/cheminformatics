@@ -17,9 +17,10 @@ Overview
     |  +- final/        # final data for figures/visualizations, will not be altered once created
     |
     |- code/            # all programmatic code relating to the project
-    |  |- template_engine_python.py # tool for generating new Python scripts containing boilerplate code
-    |  |- template_engine_R.py       # tool for generating new R scripts containing boilerplate code
-    |  +- template_engine_Rmd.py       # tool for generating new R-markdown scripts containing boilerplate code
+    |  |- template_engine_python.py           # tool for generating new Python scripts containing boilerplate code
+    |  |- template_engine_jupyter-notebook.py # tool for generating new Python scripts containing boilerplate code
+    |  |- template_engine_R.py                # tool for generating new R scripts containing boilerplate code
+    |  +- template_engine_R-notebook.py       # tool for generating new R-markdown scripts containing boilerplate code
     |
     |- results          # all output from workflows and analyses
     |  |- figures/      # graphs, likely designated for manuscript figures
@@ -45,14 +46,15 @@ How to use
 Goals and their status
 ----------
 
-Collect all BRENDA data -- Done \
-Split BRENDA file into single EC files -- Not started \
-Extract all unique substrates from a single EC number -- Not started \
-Figure out how to filter out co-factors -- Not started \
-Convert substrate names to Smiles/InChi -- Not started \
-Calculate fingerprints from Smiles/InChi -- Not started \
-Implement different algorithms for comparing fingerprints -- Not started \
-Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- Not started \
-Match up the inputs and outputs between the different steps to make a complete pipeline -- Not started \
-Run pipeline on all of BRENDA -- Not started \
-Use visualization tools to explore data -- Not started \
+Collect all BRENDA data -- **Done** \
+Split BRENDA file into single EC files -- **Not started** \
+Extract all unique substrates from a single EC number -- **Not started** \
+Figure out how to filter out co-factors -- **Not started** \
+Convert substrate names to Smiles/InChi -- **Not started** \
+Calculate fingerprints from Smiles/InChi -- **Not started** \
+Implement different algorithms for comparing fingerprints -- **Not started** \
+Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **Not started** \
+Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
+Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
+Run pipeline on all of BRENDA -- **Not started** \
+Use visualization tools to explore data -- **Not started** \
