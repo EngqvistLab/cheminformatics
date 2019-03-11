@@ -1,1 +1,1 @@
-Folder containing data that is in its final state and will be used for visualizations/interpretation.
+Folder containing cleaned data for figures/visualizations, will not be altered once created

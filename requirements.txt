@@ -1,0 +1,2 @@
+This is the template file, no requirement list has been generated.
+For Python projects run: pip freeze > requirements.txt

@@ -1,1 +1,1 @@
-Folder containing output files, figures etc.
+Folder containing all output from workflows and analyses

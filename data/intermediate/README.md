@@ -1,1 +1,1 @@
-Folder containing data that has been processed from its raw format, but more processing may be needed.
+Folder containing intermediate data on its way from raw to final, are not changed once created
