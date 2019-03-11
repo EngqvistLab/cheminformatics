@@ -69,6 +69,12 @@ Install rdkit in the anaconda environment (https://www.rdkit.org/docs/Install.ht
 conda install -c conda-forge rdkit
 ```
 
+You may also need to install gcc
+
+```
+conda install libgcc
+```
+
 Documentation: https://www.rdkit.org/docs/index.html
 
 Getting started: https://www.rdkit.org/docs/GettingStartedInPython.html
