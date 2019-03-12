@@ -54,17 +54,17 @@ pip install python-dotenv
 Goals and their status
 ----------
 
-Collect all BRENDA data -- **Done** \
+Collect all BRENDA data -- **Done, Martin** \
 Split BRENDA file into single EC files -- **In progress, Oskar** \
-Extract all unique substrates from a single EC number -- **Not started** \
-Figure out how to filter out co-factors -- **Not started** \
-Convert substrate names to Smiles/InChi -- **Partially done, David** \
-Calculate fingerprints from Smiles/InChi -- **Partially done, David** \
+Extract all unique substrates from a single EC number -- **In progress, Martin** \
+Figure out how to filter out co-factors -- **In progress, Martin** \
+Convert substrate names to Smiles/InChi -- **Partially done, Emma, Rasmus, David** \
+Calculate fingerprints from Smiles/InChi -- **Partially done, Emma, Rasmus, David** \
 Implement different algorithms for comparing fingerprints \
 ......Kernels -- **In progress, David** \
-......Graph algorithms NAMS -- **In progress, Isabella** \
-......RDKit -- **In progress, David** \
-Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **Not started** \
+......Graph algorithms to find common subgraphs -- **In progress, Isabella** \
+......RDKit -- **In progress, Emma, Rasmus, David** \
+Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **In progress, Jonathan** \
 Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
 Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
 Picking Diverse Molecules Using Fingerprints -- **Not started** (Picking Diverse Molecules Using Fingerprints in RDKit)
