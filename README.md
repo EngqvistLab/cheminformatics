@@ -41,19 +41,29 @@ How to use
 * Create a new directory for your project.
 * Download the [latest version] of this repository, and unzip it in the directory you just created.
 * **Create a .env file using a basic text editor (keep it empty if you like) and place in the project base directory (where notebook.txt and requirements.txt are). The code templates will not work without it.**
-* You will need the dotenv package for this to work. Do "conda install -c conda-forge python-dotenv" or "pip install python-dotenv".
+* You will need the dotenv package for this to work.
+```
+# do
+conda install -c conda-forge python-dotenv
+
+# OR
+pip install python-dotenv
+```
 
 
 Goals and their status
 ----------
 
 Collect all BRENDA data -- **Done** \
-Split BRENDA file into single EC files -- **Not started** \
+Split BRENDA file into single EC files -- **In progress, Oskar** \
 Extract all unique substrates from a single EC number -- **Not started** \
 Figure out how to filter out co-factors -- **Not started** \
-Convert substrate names to Smiles/InChi -- **Not started** \
-Calculate fingerprints from Smiles/InChi -- **Not started** \
+Convert substrate names to Smiles/InChi -- **Partially done, David** \
+Calculate fingerprints from Smiles/InChi -- **Partially done, David** \
 Implement different algorithms for comparing fingerprints -- **Not started** \
+      Kernels -- **In progress, David**
+      Graph algorithms NAMS -- **In progress, Isabella**
+      RDKit -- **In progress, David**
 Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **Not started** \
 Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
 Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
@@ -79,3 +89,11 @@ conda install libgcc
 Documentation: https://www.rdkit.org/docs/index.html
 
 Getting started: https://www.rdkit.org/docs/GettingStartedInPython.html
+
+
+Resources for CIRpy
+------------
+
+
+
+https://cirpy.readthedocs.io/en/latest/guide/resolvers.html
