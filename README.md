@@ -60,7 +60,7 @@ Extract all unique substrates from a single EC number -- **Not started** \
 Figure out how to filter out co-factors -- **Not started** \
 Convert substrate names to Smiles/InChi -- **Partially done, David** \
 Calculate fingerprints from Smiles/InChi -- **Partially done, David** \
-Implement different algorithms for comparing fingerprints -- **Not started** \
+Implement different algorithms for comparing fingerprints \
 ......Kernels -- **In progress, David** \
 ......Graph algorithms NAMS -- **In progress, Isabella** \
 ......RDKit -- **In progress, David** \
@@ -94,6 +94,11 @@ Getting started: https://www.rdkit.org/docs/GettingStartedInPython.html
 Resources for CIRpy
 ------------
 
+```
+pip install cirpy
+```
+
+Getting started: https://cirpy.readthedocs.io/en/latest/guide/gettingstarted.html
 
 
 https://cirpy.readthedocs.io/en/latest/guide/resolvers.html
