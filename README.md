@@ -41,6 +41,7 @@ How to use
 * Create a new directory for your project.
 * Download the [latest version] of this repository, and unzip it in the directory you just created.
 * **Create a .env file using a basic text editor (keep it empty if you like) and place in the project base directory (where notebook.txt and requirements.txt are). The code templates will not work without it.**
+* You will need the dotenv package for this to work. Do "conda install -c conda-forge python-dotenv" or "pip install python-dotenv".
 
 
 Goals and their status
