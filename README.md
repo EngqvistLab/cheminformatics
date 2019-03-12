@@ -67,6 +67,7 @@ Implement different algorithms for comparing fingerprints \
 Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **Not started** \
 Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
 Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
+Picking Diverse Molecules Using Fingerprints -- **Not started** (Picking Diverse Molecules Using Fingerprints in RDKit)
 Run pipeline on all of BRENDA -- **Not started** \
 Use visualization tools to explore data -- **Not started**
 
