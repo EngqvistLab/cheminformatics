@@ -78,7 +78,7 @@ To support the final analysis and to have computational flexibility we need func
 
 **Single molecule:** \
 name -> smiles \
-smiles -> fingerprint (should be able to choose which fingerprint) \ 
+smiles -> fingerprint (should be able to choose which fingerprint) \
 smiles -> draw molecule structure
 
 
