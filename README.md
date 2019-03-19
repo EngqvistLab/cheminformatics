@@ -51,25 +51,79 @@ pip install python-dotenv
 ```
 
 
-Goals and their status
+Initial goals and their status
 ----------
 
 Collect all BRENDA data -- **Done, Martin** \
-Split BRENDA file into single EC files -- **In progress, Oskar** \
-Extract all unique substrates from a single EC number -- **In progress, Martin** \
-Figure out how to filter out co-factors -- **In progress, Martin** \
-Convert substrate names to Smiles/InChi -- **Partially done, Emma, Rasmus, David** \
-Calculate fingerprints from Smiles/InChi -- **Partially done, Emma, Rasmus, David** \
+Split BRENDA file into single EC files -- **Done, Oskar** \
+Extract all unique substrates from a single EC number -- **Done, Martin** \
+Figure out how to filter out co-factors -- **Partially done, Martin** \
+Convert substrate names to Smiles/InChi -- **Done, Emma, Rasmus, David** \
+Calculate fingerprints from Smiles/InChi -- **Done, Emma, Rasmus, David** \
 Implement different algorithms for comparing fingerprints \
 ......Kernels -- **In progress, David** \
 ......Graph algorithms to find common subgraphs -- **In progress, Isabella** \
 ......RDKit -- **In progress, Emma, Rasmus, David** \
-Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **In progress, Jonathan** \
+Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **Done, Jonathan**
+
+
+
+
+More complex goals and their status
+----------
+
+To support the final analysis and to have computational flexibility we need functions for the following:
+
+
+
+**Single molecule:** \
+name -> smiles \
+smiles -> fingerprint (should be able to choose which fingerprint) \ \
+smiles -> draw molecule structure \
+
+
+
+**Two or more molecules in a list:** \
+list of names -> list of smiles \
+list of smiles -> list of fingerprints (should be able to choose which fingerprint) \
+list of smiles -> draw all molecule structures \
+
+
+list of two fingerprints -> compute similarity score between the pair of molecules \
+list of many fingerprints -> compute all vs all similarity scores \
+
+
+list of two fingerprints -> compute whether common substructure exists in the pair \
+list of many fingerprints -> compute whether common substructure exists between all possible pairs \
+
+
+visualize common substructure of two molecules \
+
+
+
+**I also want these scripts to support our work in the lab. There we select a subset of substrates from each EC to test** \
+* Given a set of molecules, with m molecules already selected, select one molecule such that it maximizes the chemical diversity in the selection m + n \
+* Given a set of molecules, make a selection of n molecules that maximizes the chemical diversity in the selection \
+
+
+
+**Before we can analyze EC number substrate diversity we need to remove molecules that are co-factors in the reaction** \
+* For each EC, filter out substrates matching a pre-defined list. \
+* On the remainder calculate all pairwise Tanimoto scores. \
+* For each molecule calculate the sum of tanimoto scores, the median tanimoto score, the minimum tanimoto score and the maximum tanimoto score. \
+* Use the calculated values to flag substrates that are very different from the others. Manual curation will have to follow. \
+
+
+
+Final goals and their status
+------------
+
 Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
 Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
-Picking Diverse Molecules Using Fingerprints -- **Not started** (Picking Diverse Molecules Using Fingerprints in RDKit)
 Run pipeline on all of BRENDA -- **Not started** \
-Use visualization tools to explore data -- **Not started**
+Use visualization tools to explore data, make graphs -- **Not started**
+
+
 
 
 Resources for RDKit
