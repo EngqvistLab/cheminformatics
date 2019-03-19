@@ -78,40 +78,40 @@ To support the final analysis and to have computational flexibility we need func
 
 **Single molecule:** \
 name -> smiles \
-smiles -> fingerprint (should be able to choose which fingerprint) \ \
-smiles -> draw molecule structure \
+smiles -> fingerprint (should be able to choose which fingerprint) \ 
+smiles -> draw molecule structure
 
 
 
 **Two or more molecules in a list:** \
 list of names -> list of smiles \
 list of smiles -> list of fingerprints (should be able to choose which fingerprint) \
-list of smiles -> draw all molecule structures \
+list of smiles -> draw all molecule structures
 
 
 list of two fingerprints -> compute similarity score between the pair of molecules \
-list of many fingerprints -> compute all vs all similarity scores \
+list of many fingerprints -> compute all vs all similarity scores
 
 
 list of two fingerprints -> compute whether common substructure exists in the pair \
-list of many fingerprints -> compute whether common substructure exists between all possible pairs \
+list of many fingerprints -> compute whether common substructure exists between all possible pairs
 
 
-visualize common substructure of two molecules \
-
-
-
-**I also want these scripts to support our work in the lab. There we select a subset of substrates from each EC to test** \
-* Given a set of molecules, with m molecules already selected, select one molecule such that it maximizes the chemical diversity in the selection m + n \
-* Given a set of molecules, make a selection of n molecules that maximizes the chemical diversity in the selection \
+visualize common substructure of two molecules
 
 
 
-**Before we can analyze EC number substrate diversity we need to remove molecules that are co-factors in the reaction** \
-* For each EC, filter out substrates matching a pre-defined list. \
-* On the remainder calculate all pairwise Tanimoto scores. \
-* For each molecule calculate the sum of tanimoto scores, the median tanimoto score, the minimum tanimoto score and the maximum tanimoto score. \
-* Use the calculated values to flag substrates that are very different from the others. Manual curation will have to follow. \
+**I also want these scripts to support our work in the lab. There we select a subset of substrates from each EC to test**
+* Given a set of molecules, with m molecules already selected, select one molecule such that it maximizes the chemical diversity in the selection m + n
+* Given a set of molecules, make a selection of n molecules that maximizes the chemical diversity in the selection
+
+
+
+**Before we can analyze EC number substrate diversity we need to remove molecules that are co-factors in the reaction**
+* For each EC, filter out substrates matching a pre-defined list.
+* On the remainder calculate all pairwise Tanimoto scores.
+* For each molecule calculate the sum of tanimoto scores, the median tanimoto score, the minimum tanimoto score and the maximum tanimoto score.
+* Use the calculated values to flag substrates that are very different from the others. Manual curation will have to follow.
 
 
 
