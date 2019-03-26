@@ -45,6 +45,21 @@ def similarity(smile, fingerprint_algorithm = "morgan"):
         similarity_df.loc[(x,y), 'Cosine']= DataStructs.FingerprintSimilarity(smile_fp[x],smile_fp[y], metric=DataStructs.CosineSimilarity)
     
     similarity_df = similarity_df.sort_values('Tanimoto', ascending=False)
+
+    #Calculates max, min and mean for the similarity score, in another dataframe 
+
+    summary_index = ['Tanimoto', 'Dice', 'Cosine']
+    summary_column = ['max','min', 'mean']
+    summary_df = pd.DataFrame(index = summary_index, columns = summary_column) 
+    
+    for i in summary_index:
+        summary_df.loc[(i), 'max'] = similarity_df[i].max()
+        summary_df.loc[(i), 'min'] = similarity_df[i].min()
+        summary_df.loc[(i), 'mean'] = similarity_df[i].mean()
+        
+    
+
+    return similarity_df, summary_df
+
     
     
-    return similarity_df
