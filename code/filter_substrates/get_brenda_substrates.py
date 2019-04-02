@@ -68,11 +68,7 @@ import hashlib
 import re
 import json
 
-
-BRENDA_USERNAME = 'martin.engqvist@chalmers.se'
-BRENDA_PASS = "bunny123"
-
-
+# BRENDA_USERNAME and BRENDA_PASS needs to be registered in the BRENDA website and then added to the .env file of this repository.
 parameters = BRENDA_USERNAME + ',' + hashlib.sha256(BRENDA_PASS).hexdigest()
 
 
@@ -86,7 +82,7 @@ def get_substrates(filepath):
 	'''
 	Download data regarding the substrates for each EC
 	'''
-	# Get the names of all organisms 
+	# Get the names of all organisms
 	resultString = client.getEcNumbersFromSubstrate(parameters)
 
 	ec_list = resultString.split('!')
@@ -119,7 +115,7 @@ def get_natural_substrates(filepath):
 	'''
 	Download data regarding the natural substrates for each EC
 	'''
-	# Get the names of all organisms 
+	# Get the names of all organisms
 	resultString = client.getEcNumbersFromNaturalSubstrate(parameters)
 
 	ec_list = resultString.split('!')
@@ -134,7 +130,7 @@ def get_natural_substrates(filepath):
 			print(counter)
 
 		data[ec] = client.getNaturalSubstrate(parameters + ',' + "ecNumber*%s" % ec)
-	
+
 		time.sleep(1)
 
 	# save to file
@@ -144,7 +140,7 @@ def get_natural_substrates(filepath):
 
 
 
-		
+
 
 
 
@@ -182,7 +178,7 @@ def get_temperature_optima(filepath):
 
 			else: #organism is present, merge data
 				data[organism] = data[organism] + '!' + org_optima_result
-	
+
 		time.sleep(1)
 
 	# save to file
@@ -251,13 +247,13 @@ def parse_temp(filepath):
 	return data
 
 
-#get_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
+get_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
 
 
-#get_natural_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'natural_substrates_data.txt'))
+get_natural_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'natural_substrates_data.txt'))
 
 
-#parse_substrates(join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
+parse_substrates(join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
 
 #get_temperature_optima('temp_optima.json')
 #parse_temp('temp_optima.json')
