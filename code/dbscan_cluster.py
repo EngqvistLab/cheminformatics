@@ -6,7 +6,7 @@ from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 import numpy as np
 
-def dbscan_cluster(smile, eps=0.4, min_samples=2, perplexity=5.0, learning_rate=500.0,n_iter=5000):
+def dbscan_cluster(smile, eps=0.2, min_samples=2, perplexity=5.0, learning_rate=500.0,n_iter=5000):
     """
     Input: a list containing smiles.
     Output: DBSCAN cluster for the molecules, visualised with colours in a 2D plot and 

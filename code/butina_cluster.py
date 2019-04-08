@@ -7,7 +7,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
 
-def butina_cluster(smile, cutoff=0.8, perplexity=3.0, learning_rate=400.0,n_iter=5000):
+def butina_cluster(smile, cutoff=0.8, perplexity=5.0, learning_rate=500.0,n_iter=5000):
     
     """
     Input: a list containing smiles.
