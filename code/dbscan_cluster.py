@@ -42,7 +42,7 @@ def dbscan_clustering(smile, eps=0.3, min_samples=2):
     print(f"The clustering labels are: {clustering.labels_}. \nThe index of this list corresponds to the index of smile_list.")
     
     #Generates a list that contains lists with all smiles that are in a cluster.
-    dbscan_cluster = []
+    smile_cluster = []
     for number in set(clustering.labels_):
         index = 0
         lista = []
@@ -50,7 +50,6 @@ def dbscan_clustering(smile, eps=0.3, min_samples=2):
             if label == number:
                 lista.append(smile_list[index])
             index += 1
-        dbscan_cluster.append(lista)     
+        smile_cluster.append(lista)     
     
-    return dbscan_cluster
-    
+    return smile_cluster
