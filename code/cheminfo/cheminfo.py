@@ -130,7 +130,7 @@ class NameToSmile(object):
 	            data = {}
 
 	        else:
-	            data = self_open_file(self.most_recent_file) # get most recent data
+	            data = self._open_file(self.most_recent_file) # get most recent data
 
 	        self._save_data(data) # save into todays filename
 	        return data
@@ -166,11 +166,17 @@ class NameToSmile(object):
 
 			if name not in self.smile_data.keys():
 				counter += 1
-				self.smile_data[name] = cirpy.resolve(name, 'smiles')
+				result = cirpy.resolve(name, 'smiles')
+				if result is None:
+					result =
+				self.smile_data[name] = result
 
 			elif self.retest_none is True and name in self.smile_data.keys() and self.smile_data.get(name) is None:
 				counter += 1
-				self.smile_data[name] = cirpy.resolve(name, 'smiles')
+				result = cirpy.resolve(name, 'smiles')
+				if result is None:
+					result =
+				self.smile_data[name] = result
 
 			if counter % 100 == 0:
 				self._save_data(self.smile_data)
@@ -178,38 +184,38 @@ class NameToSmile(object):
 		self._save_data(self.smile_data)
 
 
-	def names(self, include_none=True):
+	def names(self, exclude_none=False):
 		'''
 		Return a list of the input molecule names.
-		If include_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
-		if include_none is True:
+		if exclude_none is True:
 			return self.input_names
 
-		elif include_none is False:
+		elif exclude_none is False:
 			return [s for s in self.input_names if self.smile_data[s] is not None]
 
 		else:
 			raise ValueError
 
 
-	def smiles(self, include_none=True):
+	def smiles(self, exclude_none=False):
 		'''
 		Return a list of the output molecule smiles.
-		If include_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
-		return [self.smile_data[s] for s in self.names(include_none)]
+		return [self.smile_data[s] for s in self.names(exclude_none)]
 
 
-	def data(self, include_none=True):
+	def data(self, exclude_none=False):
 		'''
 		Return a dictionary with substrate name keys and smile values.
-		If include_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
-		return {k:v for k, v in zip(self.names(include_none), self.smiles(include_none))}
+		return {k:v for k, v in zip(self.names(exclude_none), self.smiles(exclude_none))}
 
 
-subswithsmiles = {'Massa ringar' : 'COc1cccc2cc(C(=O)NCCCCN3CCN(c4cccc5nccnc54)CC3)oc21','L-lactate' : "C([C@@H](O)C)(=O)[O-]", 'Glucose' : 'O=C[C@H](O)[C@@H](O)[C@H](O)[C@H](O)CO', 'Glutamate' : "N[C@@H](CCC(=O)[O-])C(=O)[O-]"}
+#subswithsmiles = {'Massa ringar' : 'COc1cccc2cc(C(=O)NCCCCN3CCN(c4cccc5nccnc54)CC3)oc21','L-lactate' : "C([C@@H](O)C)(=O)[O-]", 'Glucose' : 'O=C[C@H](O)[C@@H](O)[C@H](O)[C@H](O)CO', 'Glutamate' : "N[C@@H](CCC(=O)[O-])C(=O)[O-]"}
 
 
 class SmileToData(object):
@@ -248,7 +254,7 @@ class SmileToData(object):
 		}
 
 		assert descriptor in self.descriptors.keys(), 'Error, the argument discriptor must be one of: %s' % ', '.join(self.descriptors.keys())
-		assert descriptor in self.metrics.keys(), 'Error, the argument metri must be one of: %s' % ', '.join(self.metrics.keys())
+		assert metric in self.metrics.keys(), 'Error, the argument metri must be one of: %s' % ', '.join(self.metrics.keys())
 		self.descriptor = descriptor
 		self.metric = metric
 
@@ -258,31 +264,62 @@ class SmileToData(object):
 		# make a list of fingerprints
 		self.fingerprints = [self.descriptors[self.descriptor](s) for s in self.mols]
 
+		# compute the similarity matrix
+		self.similarity_matrix = self._compute_similarity_matrix()
+
+		# compute the similarity stats
+		self.similarity_stats = self._compute_similarity_stats()
+
+
+	def _compute_similarity_matrix(self):
+		"""
+		Returns a data frame with pairwise similarity scores for a list of molecules,
+		specified by a list of names and a list of corresponding smiles formats given
+		as input parameters. The fingerprints and similarity coefficients can be chosen
+		from the list of descriptors and metrics (default 'rdkit' and 'tanimoto').
+		"""
+		# all against all similarity matrix
+		S = []
+		score = self.metrics[self.metric] # similarity score
+		for fp in self.fingerprints:
+			S.append(score(fp, self.fingerprints))
+
+		return pd.DataFrame(S, index=self.names, columns=self.names)
+
+
+	def _compute_similarity_stats(self):
+		'''
+		'''
+		return None
+
 
 	def valid_descriptors(self):
 		'''
-		Return valid values for descriptors
+		Return a list of all valid values for descriptors
 		'''
-		return self.descriptors.keys()
+		return list(self.descriptors.keys())
 
 
 	def valid_metrics(self):
 		'''
-		Return valid values for metrics.
+		Return a list of all valid values for metrics.
 		'''
-		return self.metrics.keys()
+		return list(self.metrics.keys())
 
 
 	def diversity_pick(self, n, firstpicks=[]):
 		"""
 		Picks a maximally diverse subset of a sert of molecules using the RDKit
-		MaxMinPicker. The molecules are given as a list of names and a list with the
-		corresponding smiles formats. Optionally, a list of names with already
+		MaxMinPicker. Optionally, a list of names with already
 		chosen molecules can be specified.
 		"""
+		assert type(firstpicks) in [list, set], 'Error, the input firstpicks must be a list or set'
+		assert all([type(s) is str for s in firstpicks]), 'Error, each item in the input list firstpicks must be a string'
+		assert type(n) is int, 'Error, the input n must be an integer'
+
 		firstpicks = [s.lower() for s in firstpicks]
 		assert all([s in self.names for s in firstpicks]), 'Error, not all firstpicks are part of the molecule list'
-		assert n <= len(self.names) - len(firstpicks), 'Error, you have specified an n that is greater than the available molecule number'
+		assert n < len(self.names) - len(firstpicks), 'Error, you have specified an n that is greater or equal to the available molecule number'
 
 		# get indices of already picked molecules
 		ind = []
@@ -295,52 +332,39 @@ class SmileToData(object):
 		for i in range(1, len(self.fingerprints)):
 			ds.extend(score(self.fingerprints[i], self.fingerprints[:i], returnDistance=True))
 
-		# make the selection
+		# make the selection (returns indeces)
 		ids = MaxMinPicker().Pick(np.array(ds), len(self.fingerprints), n, ind)
-		return ids
+
+		return [self.names[s] for s in ids]
 
 
-	def _compute_similarity(self):
-		"""
-		Returns a data frame with pairwise similarity scores for a list of molecules,
-		specified by a list of names and a list of corresponding smiles formats given
-		as input parameters. The fingerprints and similarity coefficients can be chosen
-		from the list of descriptors and metrics (default 'rdkit' and 'tanimoto').
-		"""
-
-		# make a list of mols
-		ms = [Chem.MolFromSmiles(x) for x in smiles]
-
-		# make a list of fingerprints
-		fingerprint = descriptors[descriptor] # fingerprint type
-		fps = [fingerprint(x) for x in ms]
-
-		# all against all similarity matrix
-		S = []
-		score = metrics[metric] # similarity score
-		for fp in fps:
-			S.append(score(fp, fps))
-
-		return pd.DataFrame(S, index=names, columns=names)
-
-
-	def pair_similarity(self, ):
+	def pair_similarity(self, molecules):
 		'''
-		Similarity measure between two of the molecules in the set
+		Return similarity measure between a list of specified molecules.
+		These have to be part of the original input molecules.
 		'''
+		assert type(molecules) in [list, set], 'Error, the input molecules must be a list or set'
+		assert all([type(s) is str for s in molecules]), 'Error, each item in the input list molecules must be a string'
+		assert all([s in self.names for s in molecules]), 'Error, not all molecules are part of the molecule list'
+
 		pass
 
 
-	def all_similarity(self):
+	def similarity(self):
 		'''
-		Similarity matrix with all similarities
+		Return similarity matrix with all similarities
 		'''
-		pass
-
-	# also put the code for min max mean etc...
+		return self.similarity_matrix
 
 
-	def plotMCS(names, smiles, molRows=5, subSize=200):
+	def similarity_stats(self):
+		'''
+		Return the similarity statistics
+		'''
+		return self.similarity_stats
+
+
+	def plotMCS(self, names, smiles, molRows=5, subSize=200):
 		"""
 		Plots a given set of molecules in a grid with their maximum common substructure
 		highlighted in red. The molecules are given as a list of names and a list with
@@ -365,7 +389,7 @@ class SmileToData(object):
 		img.save('mcs.png')
 
 
-	def draw_substrate_structures(SubstratesWSMILES):
+	def draw_substrate_structures(self, SubstratesWSMILES):
 		"""Takes as input a dictionary of substrate names and their SMILES representation, and returns a single .png file containing
 		drawings of all their structures.
 		"""
@@ -391,7 +415,7 @@ class SmileToData(object):
 
 
 
-	def molecular_weight(substrate_dict):
+	def molecular_weight(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format and returns a dictionary of substrate names and
 	    and their respective molecular weight."""
 	    molweight = {}
@@ -401,7 +425,7 @@ class SmileToData(object):
 	    return molweight
 
 
-	def polar_surface_area(substrate_dict):
+	def polar_surface_area(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES and returns a dictionary of substrate names and
 	       their respective polar surface area."""
 	    TPSA = {}
@@ -412,7 +436,7 @@ class SmileToData(object):
 
 	# Kanske att föredra att dela upp den här i två funktioner?
 
-	def Hbond_donors_acceptors(substrate_dict):
+	def Hbond_donors_acceptors(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES and returns a list of dictionaries of substrate names and
 	       their respective number of hydrogen bond acceptors and donors. Acceptors on index 0, donors on index 1."""
 	    acceptors = {}
@@ -424,7 +448,7 @@ class SmileToData(object):
 	    return acceptors, donors
 
 
-	def OHNH_count(substrate_dict):
+	def OHNH_count(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format, calculates the number of NH and OH groups, and outputs
 	       a dictionary containing the substrate names and their respective counts."""
 	    OHNH = {}
@@ -434,7 +458,7 @@ class SmileToData(object):
 	    return OHNH
 
 
-	def ON_count(substrate_dict):
+	def ON_count(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format, calculates the number of O and N atoms, and outputs
 	        a dictionary containing the substrate names and their respective counts. """
 	    ON = {}
@@ -444,7 +468,7 @@ class SmileToData(object):
 	    return ON
 
 
-	def HeteroAtomCount(substrate_dict):
+	def HeteroAtomCount(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format, calculates the number of
 	        hetero atoms and returns a dictionary containing the substrate names and their respective hetero counts."""
 	    HA = {}
@@ -454,7 +478,7 @@ class SmileToData(object):
 	    return HA
 
 
-	def RotaBondCount(substrate_dict):
+	def RotaBondCount(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format, calculates the number of
 	        rotatable bonds and returns a dictionary containing the substrate names and their respective rotatable bond counts."""
 	    RB = {}
@@ -464,7 +488,7 @@ class SmileToData(object):
 	    return RB
 
 
-	def AromRingCount(substrate_dict):
+	def AromRingCount(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format, calculates the number of
 	        aromatic rings and returns a dictionary containing the substrate names and their respective aromatic ring counts"""
 	    RING = {}
@@ -474,7 +498,7 @@ class SmileToData(object):
 	    return RING
 
 
-	def AliphRingCount(substrate_dict):
+	def AliphRingCount(self, substrate_dict):
 	    """Takes as input a dictionary of substrate names and their SMILES, converts to mol-format, calculates the number of
 	        aliphatic rings and returns a dictionary containing the substrate names and their respective aliphatic ring counts"""
 	    RING2 = {}
@@ -482,6 +506,12 @@ class SmileToData(object):
 	        mol = Chem.MolFromSmiles(substrate_dict[key])
 	        RING2[key] = Descriptors.NumAliphaticRings(mol)
 	    return RING2
+
+
+# do MDS on distances
+# do PCA on data
+# do t-sne on distances
+# do t-sne on data
 
 
 

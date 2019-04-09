@@ -32,6 +32,7 @@ load_dotenv(dotenv_path)
 
 class BrendaSubstrates():
     '''
+    Class for getting, parsing, and obtaining subsets of BRENDA data.
     '''
     def __init__(self):
         pass
