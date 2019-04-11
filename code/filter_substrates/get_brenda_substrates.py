@@ -76,8 +76,6 @@ endpointURL = "https://www.brenda-enzymes.org/soap/brenda_server.php"
 client = SOAPProxy(endpointURL)
 
 
-
-
 def get_substrates(filepath):
 	'''
 	Download data regarding the substrates for each EC
@@ -107,10 +105,6 @@ def get_substrates(filepath):
 
 
 
-
-
-
-
 def get_natural_substrates(filepath):
 	'''
 	Download data regarding the natural substrates for each EC
@@ -136,10 +130,6 @@ def get_natural_substrates(filepath):
 	# save to file
 	with open(filepath, 'w') as outfile:
 		json.dump(data, outfile)
-
-
-
-
 
 
 
