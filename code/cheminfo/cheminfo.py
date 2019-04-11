@@ -27,6 +27,7 @@ import datetime
 
 import numpy as np
 import pandas as pd
+from statistics import mean, median, stdev
 
 from rdkit import Chem
 from rdkit import DataStructs
@@ -305,8 +306,11 @@ class SmileToData(object):
 		# compute the similarity matrix
 		self.similarity_matrix = self._compute_similarity_matrix()
 
-		# compute the similarity stats
-		self.similarity_stats = self._compute_similarity_stats()
+		# compute the molecule similarity stats
+		self.mol_stats = self._compute_mol_stats()
+
+		# compute the global similarity stats
+		self.glob_stats = self._compute_glob_stats()
 
 
 	def _compute_similarity_matrix(self):
@@ -325,10 +329,42 @@ class SmileToData(object):
 		return pd.DataFrame(S, index=self.input_names, columns=self.input_names)
 
 
-	def _compute_similarity_stats(self):
+	def _compute_glob_stats(self):
 		'''
+		Compute some basic statistics on the similarity matrix
 		'''
-		return None
+		sim_data = self.similarity().copy()
+
+		# get rid of half the matrix and the diagonal
+		sim_data.values[np.tril_indices_from(sim_data)] = np.nan
+		glob_stats = {'min':sim_data.unstack().min(),
+								'max':sim_data.unstack().max(),
+								'sum':sim_data.unstack().sum(),
+								'median':sim_data.unstack().median(),
+								'mean':sim_data.unstack().mean(),
+								'stdev':sim_data.unstack().std()}
+		return glob_stats
+
+
+	def _compute_mol_stats(self):
+		'''
+		Compute some basic statistics on the similarity matrix
+		'''
+		sim_data = self.similarity().copy()
+
+		# remove the diagonal
+		sim_data.values[tuple([np.arange(sim_data.shape[0])]*2)] = np.nan
+
+		# calculate stats
+		mol_stats = pd.DataFrame()
+		mol_stats['min'] = sim_data.min()
+		mol_stats['max'] = sim_data.max()
+		mol_stats['sum'] = sim_data.sum()
+		mol_stats['median'] = sim_data.median()
+		mol_stats['mean'] = sim_data.mean()
+		mol_stats['stdev'] = sim_data.std()
+
+		return mol_stats
 
 
 	def valid_descriptors(self):
@@ -440,18 +476,6 @@ class SmileToData(object):
 		return pd.DataFrame(combined_dict)
 
 
-	# def pair_similarity(self, molecules):
-	# 	'''
-	# 	Return similarity measure between a list of specified molecules.
-	# 	These have to be part of the original input molecules.
-	# 	'''
-	# 	assert type(molecules) in [list, set], 'Error, the input molecules must be a list or set'
-	# 	assert all([type(s) is str for s in molecules]), 'Error, each item in the input list molecules must be a string'
-	# 	assert all([s in self.names for s in molecules]), 'Error, not all molecules are part of the molecule list'
-	#
-	# 	pass
-
-
 	def similarity(self):
 		'''
 		Return similarity matrix with all similarities
@@ -466,11 +490,18 @@ class SmileToData(object):
 		return 1-self.similarity_matrix
 
 
-	def similarity_stats(self):
+	def molecule_similarity_stats(self):
 		'''
-		Return the similarity statistics
+		Return similarity statistics for each molecule
 		'''
-		return self.similarity_stats
+		return self.mol_stats
+
+
+	def global_similarity_stats(self):
+		'''
+		Return the global similarity statistics for the entire dataset
+		'''
+		return self.glob_stats
 
 
 	def diversity_pick(self, n, firstpicks=[]):
