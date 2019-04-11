@@ -17,29 +17,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from os.path import join, dirname, basename, exists, isdir
-
-import cirpy
-from pubchempy import Compound, get_compounds
-
 import json
 import re
 import datetime
 
 import numpy as np
 import pandas as pd
-from statistics import mean, median, stdev
+import matplotlib.pyplot as plt
+
+import cirpy
+from pubchempy import Compound, get_compounds
 
 from rdkit import Chem
 from rdkit import DataStructs
 from rdkit.Chem import AllChem, MACCSkeys, rdFMCS, Draw, Descriptors, rdmolops
 from rdkit.Chem.Fingerprints import FingerprintMols
 from rdkit.SimDivFilters.rdSimDivPickers import MaxMinPicker
-
 from rdkit.Chem.Draw import IPythonConsole #Needed to show molecules
 from rdkit.Chem.Draw.MolDrawing import MolDrawing, DrawingOptions #Only needed if modifying defaults
+from rdkit.ML.Cluster import Butina
+
+from sklearn.decomposition import PCA
+from sklearn.cluster import DBSCAN
+from sklearn.manifold import TSNE, MDS
 
 from helpfunctions import clean_name
-
 
 
 class NameToSmile(object):
@@ -72,6 +74,9 @@ class NameToSmile(object):
 
 		# get any missing smiles
 		self._get_missing_smiles()
+
+		# remove duplicates
+		self._filter_duplicates()
 
 
 	def _get_most_recent_filename(self):
@@ -196,6 +201,12 @@ class NameToSmile(object):
 
 		if counter != 1:
 			self._save_data(self.smile_data)
+
+
+	def _filter_duplicates(self):
+		'''
+		'''
+		pass
 
 
 	def names(self, exclude_none=False):
@@ -381,41 +392,55 @@ class SmileToData(object):
 		return list(self.metrics.keys())
 
 
-	def names(self, exclude_none=False):
+	def names(self):
 		'''
 		Return a list of the input molecule names.
 		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
-		if exclude_none is True:
-			return self.input_names
-
-		elif exclude_none is False:
-			return [s for s in self.input_names if self.smile_data[s] is not None]
-
-		else:
-			raise ValueError
+		return self.input_names
 
 
-	def smiles(self, exclude_none=False):
+	def smiles(self):
 		'''
 		Return a list of the output molecule smiles.
 		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
-		return [self.smile_data[s] for s in self.names(exclude_none)]
+		return [self.smile_data[s] for s in self.names()]
 
 
-	def molecules(self, exclude_none=False):
+	def molecules(self, return_only=None):
 		'''
 		Return a list of molecule objects
 		'''
-		return self.mol_data
+		if return_only is None:
+			return self.mol_data
+		else:
+			assert type(return_only) is str, 'Error, the value in return_only has to be a string.'
+			return_only = clean_name(return_only)
+			assert return_only in self.names(), 'Error, the submitted molecule is not in the original set that was used to initialize the class.'
+			ix = self.names().index(return_only)
+			return self.molecules()[ix]
 
 
-	def fingerprints(self, exclude_none=False):
+	def fingerprints(self):
 		'''
-		Return a list of the molecule fingerprints.
+		Return a list of the molecule fingerprints as objects.
 		'''
 		return self.fingerprint_data
+
+
+	def fingerprints_str(self):
+		'''
+		Return a list of the molecule fingerprints as bit strings.
+		'''
+		return [s.ToBitString() for s in self.fingerprint_data]
+
+
+	def fingerprints_list(self):
+		'''
+		Return a list of the molecule fingerprints bit lists.
+		'''
+		return [[int(b) for b in s] for s in self.fingerprints_str()]
 
 
 	def property(self, property_type):
@@ -535,79 +560,171 @@ class SmileToData(object):
 
 		return [self.input_names[s] for s in ids]
 
+	#
+	# def plotMCS(self, names, smiles, molRows=5, subSize=200):
+	# 	"""
+	# 	Plots a given set of molecules in a grid with their maximum common substructure
+	# 	highlighted in red. The molecules are given as a list of names and a list with
+	# 	the corresponding smiles formats. Optionally, the number of rows in the grid
+	# 	and the size of each subfigure can be specified.
+	# 	"""
+	# 	# make a list of mols
+	# 	ms = [Chem.MolFromSmiles(x) for x in smiles]
+	#
+	# 	# maximum common substructure
+	# 	res = rdFMCS.FindMCS(ms)
+	# 	mcs = Chem.MolFromSmarts(res.smartsString)
+	#
+	# 	# align common structure
+	# 	AllChem.Compute2DCoords(mcs)
+	# 	for m in ms: AllChem.GenerateDepictionMatching2DStructure(m, mcs)
+	#
+	# 	img = Draw.MolsToGridImage(ms, molsPerRow = molRows, \
+	# 		highlightAtomLists = [mol.GetSubstructMatch(mcs) for mol in ms], \
+	# 		subImgSize = (subSize, subSize), legends = names)
+	#
+	# 	img.save('mcs.png')
+	#
+	#
+	# def draw_substrate_structures(self, SubstratesWSMILES):
+	# 	"""Takes as input a dictionary of substrate names and their SMILES representation, and returns a single .png file containing
+	# 	drawings of all their structures.
+	# 	"""
+	#
+	# 	name = []    # Initiate list containing names.
+	# 	struct = []  # Initiate list containing mols.
+	#
+	# 	for key in SubstratesWSMILES:
+	# 		name.append(key)
+	# 		struct.append(Chem.MolFromSmiles(SubstratesWSMILES[key]))  # Calculate mol from SMILES and append to struct-list.
+	#
+	# 	# Vary row-length according to how many substrates are in dictionary. Modify these values according to preference.
+	# 	if len(SubstratesWSMILES) < 4:
+	# 		rowlength = 3
+	# 	elif len(SubstratesWSMILES) == 4:
+	# 		rowlength = 2
+	# 	else:
+	# 		rowlength = 4
+	#
+	# 	# Draw grid of molecules and their respective legends.
+	# 	img=Draw.MolsToGridImage(struct, molsPerRow = rowlength, subImgSize=(300, 300), legends = name)
+	# 	img.save('SomeECNum.png') # In completed pipeline, suggest to amend this to "img.save(filename + "substrates")"
 
-	def plotMCS(self, names, smiles, molRows=5, subSize=200):
+
+	def cluster_butina(self, cutoff=0.7):
+		'''
+		Generate a vector with
+		'''
+		# make a linear input file
+		dists = self.distance().values
+		data = []
+		for i in range(len(self.names())):
+			for j in range(i):
+				data.append(dists[i, j])
+
+		# cluster them
+		cluster_data = Butina.ClusterData(data, len(self.names()), cutoff, isDistData=True)
+
+		# generate a list with cluster belongings
+		cluster = [None] * len(self.names())
+		for i, clu in enumerate(cluster_data):
+			for member in clu:
+				cluster[member] = i
+
+		return cluster
+
+
+	def tsne(self, include_labels=False, color_categories=None, n_components=2, perplexity=10.0, learning_rate=500.0, n_iter=5000):
 		"""
-		Plots a given set of molecules in a grid with their maximum common substructure
-		highlighted in red. The molecules are given as a list of names and a list with
-		the corresponding smiles formats. Optionally, the number of rows in the grid
-		and the size of each subfigure can be specified.
+		tsne on fingerprint data down to n_components dimensions.
 		"""
-		# make a list of mols
-		ms = [Chem.MolFromSmiles(x) for x in smiles]
+		data = self.fingerprints_list()
+		tsne = TSNE(n_components=n_components,
+				perplexity=perplexity,
+				learning_rate=learning_rate,
+				n_iter=n_iter).fit_transform(data)
 
-		# maximum common substructure
-		res = rdFMCS.FindMCS(ms)
-		mcs = Chem.MolFromSmarts(res.smartsString)
-
-		# align common structure
-		AllChem.Compute2DCoords(mcs)
-		for m in ms: AllChem.GenerateDepictionMatching2DStructure(m, mcs)
-
-		img = Draw.MolsToGridImage(ms, molsPerRow = molRows, \
-			highlightAtomLists = [mol.GetSubstructMatch(mcs) for mol in ms], \
-			subImgSize = (subSize, subSize), legends = names)
-
-		img.save('mcs.png')
-
-
-	def draw_substrate_structures(self, SubstratesWSMILES):
-		"""Takes as input a dictionary of substrate names and their SMILES representation, and returns a single .png file containing
-		drawings of all their structures.
-		"""
-
-		name = []    # Initiate list containing names.
-		struct = []  # Initiate list containing mols.
-
-		for key in SubstratesWSMILES:
-			name.append(key)
-			struct.append(Chem.MolFromSmiles(SubstratesWSMILES[key]))  # Calculate mol from SMILES and append to struct-list.
-
-		# Vary row-length according to how many substrates are in dictionary. Modify these values according to preference.
-		if len(SubstratesWSMILES) < 4:
-			rowlength = 3
-		elif len(SubstratesWSMILES) == 4:
-			rowlength = 2
+		if color_categories is None:
+			plot = plt.scatter(tsne[:, 0], tsne[:, 1])
 		else:
-			rowlength = 4
+			plot = plt.scatter(tsne[:, 0], tsne[:, 1], c=color_categories, cmap='rainbow')
 
-		# Draw grid of molecules and their respective legends.
-		img=Draw.MolsToGridImage(struct, molsPerRow = rowlength, subImgSize=(300, 300), legends = name)
-		img.save('SomeECNum.png') # In completed pipeline, suggest to amend this to "img.save(filename + "substrates")"
+		# add text labels if desired
+		if include_labels is True:
+
+			# calculate a reasonable offset for the text
+			text_spacing_x = abs(max(tsne[:, 0])-min(tsne[:, 0]))/50
+			text_spacing_y = abs(max(tsne[:, 1])-min(tsne[:, 1]))/50
+
+			for i, txt in enumerate(self.names()):
+				plt.text(tsne[:, 0][i]+text_spacing_x, tsne[:, 1][i]+text_spacing_y, txt, fontsize=8)
+
+		plt.title('t-SNE plot, %s components' % n_components)
+		plt.xlabel('PC1')
+		plt.ylabel('PC2')
+
+		return plot
 
 
-	def tsne(self, include_labels=False):
+	def pca(self, include_labels=False, color_categories=None, n_components=2):
 		'''
+		PCA using fingerprint bitstrings down to n_components dimensions.
 		'''
-		pass
+		data = self.fingerprints_list()
+		pca = PCA(n_components=n_components).fit_transform(data)
+
+		if color_categories is None:
+			plot = plt.scatter(pca[:, 0], pca[:, 1])
+		else:
+			plot = plt.scatter(pca[:, 0], pca[:, 1], c=color_categories, cmap='rainbow')
+
+		# add text labels if desired
+		if include_labels is True:
+
+			# calculate a reasonable offset for the text
+			text_spacing_x = abs(max(pca[:, 0])-min(pca[:, 0]))/50
+			text_spacing_y = abs(max(pca[:, 1])-min(pca[:, 1]))/50
+
+			for i, txt in enumerate(self.names()):
+				plt.text(pca[:, 0][i]+text_spacing_x, pca[:, 1][i]+text_spacing_y, txt, fontsize=8)
+
+		plt.title('PCA plot, %s components' % n_components)
+		plt.xlabel('PC1')
+		plt.ylabel('PC2')
+
+		return plot
 
 
-	def pca(self, include_labels=False):
+	def mds(self, include_labels=False, color_categories=None, n_components=2):
 		'''
+		MDS using already computed distance values down to n_components dimensions.
 		'''
-		pass
+		data = self.distance()
+		mds = MDS(n_components=n_components, dissimilarity='precomputed', random_state=42).fit_transform(data)
+
+		if color_categories is None:
+			plot = plt.scatter(mds[:, 0], mds[:, 1])
+		else:
+			plot = plt.scatter(mds[:, 0], mds[:, 1], c=color_categories, cmap='rainbow')
+
+		# add text labels if desired
+		if include_labels is True:
+
+			# calculate a reasonable offset for the text
+			text_spacing_x = abs(max(mds[:, 0])-min(mds[:, 0]))/50
+			text_spacing_y = abs(max(mds[:, 1])-min(mds[:, 1]))/50
+
+			for i, txt in enumerate(self.names()):
+				plt.text(mds[:, 0][i]+text_spacing_x, mds[:, 1][i]+text_spacing_y, txt, fontsize=8)
+
+		plt.title('MDS plot, %s components' % n_components)
+		plt.xlabel('PC1')
+		plt.ylabel('PC2')
+
+		return plot
 
 
-	def mds(self, include_labels=False):
-		'''
-		'''
-		pass
 
-
-	def cluster(self):
-		'''
-		'''
-		pass
 
 
 # make a grid with all pairwise mols with substructure
