@@ -58,7 +58,7 @@ class NameToSmile(object):
 		'''
 		assert type(names) in [list, set], 'Error, the input must be a list or set'
 		assert all([type(s) is str for s in names]), 'Error, each item in the input list must be a string'
-		self.input_names = [clean_name(s) for s in names]
+		self.input_names = [clean_name(s) for s in names if s is not '']
 		self.retest_none = retest_none
 
 		# setup variables related to the cached file filename
@@ -155,13 +155,13 @@ class NameToSmile(object):
 			if name not in self.smile_data.keys():
 				counter += 1
 
-			elif self.retest_none is False and name in self.smile_data.keys():
+			elif name in self.smile_data.keys() and self.retest_none is False:
 				continue
 
-			elif self.retest_none is True and name in self.smile_data.keys() and self.smile_data.get(name) is not None:
+			elif name in self.smile_data.keys()  and self.retest_none is True and self.smile_data.get(name) is not None:
 				continue
 
-			elif self.retest_none is True and name in self.smile_data.keys() and self.smile_data.get(name) is None:
+			elif name in self.smile_data.keys()  and self.retest_none is True and self.smile_data.get(name) is None:
 				counter += 1
 
 			else:
@@ -185,7 +185,7 @@ class NameToSmile(object):
 					result = cirpy.resolve(name, 'smiles')
 				self.smile_data[name] = result
 
-			elif self.retest_none is True and name in self.smile_data.keys() and self.smile_data.get(name) is None:
+			elif name in self.smile_data.keys() and self.retest_none is True and self.smile_data.get(name) is None:
 				counter += 1
 
 				# Check that compound is listed on PubChem, then use cirpy
@@ -196,8 +196,13 @@ class NameToSmile(object):
 					result = cirpy.resolve(name, 'smiles')
 				self.smile_data[name] = result
 
+			else:
+				# skip those that I already have
+				continue
+
 			if counter % 100 == 0:
 				self._save_data(self.smile_data)
+				print('%s done' % counter)
 
 		if counter != 1:
 			self._save_data(self.smile_data)
