@@ -24,6 +24,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from PIL import Image
 
 import cirpy
 from pubchempy import Compound, get_compounds
@@ -33,7 +34,7 @@ from rdkit import DataStructs
 from rdkit.Chem import AllChem, MACCSkeys, rdFMCS, Draw, Descriptors, rdmolops
 from rdkit.Chem.Fingerprints import FingerprintMols
 from rdkit.SimDivFilters.rdSimDivPickers import MaxMinPicker
-from rdkit.Chem.Draw import IPythonConsole #Needed to show molecules
+from rdkit.Chem.Draw import SimilarityMaps, IPythonConsole #Needed to show molecules
 from rdkit.Chem.Draw.MolDrawing import MolDrawing, DrawingOptions #Only needed if modifying defaults
 from rdkit.ML.Cluster import Butina
 
@@ -565,55 +566,81 @@ class SmileToData(object):
 
 		return [self.input_names[s] for s in ids]
 
+
+	def draw_structures(self, highlight_substructure=False):
+		'''
+		Returns a single .png file containing drawings of all substrate structures.
+		'''
+		mols = self.molecules()
+		img_size = (300, 300)
+		num_per_row = int(round(len(mols)**0.5))
+
+		# maximum common substructure
+		res = rdFMCS.FindMCS(mols)
+		mcs = Chem.MolFromSmarts(res.smartsString)
+
+		# align common structure
+		AllChem.Compute2DCoords(mcs)
+		for m in mols:
+			AllChem.GenerateDepictionMatching2DStructure(m, mcs)
+
+		if highlight_substructure is False:
+			img = Draw.MolsToGridImage(mols, molsPerRow=num_per_row,
+										subImgSize=img_size,
+										legends=self.names())
+			return img
+
+		elif highlight_substructure is True:
+			img = Draw.MolsToGridImage(mols, molsPerRow=num_per_row,
+							highlightAtomLists = [mol.GetSubstructMatch(mcs) for mol in mols],
+							subImgSize=img_size,
+							legends=self.names())
+			return img
+
+		else:
+			raise ValueError
+
+
+	def draw_mol_comparison(self, refmol, mol):
+		'''
+		Compare the structure of two molecules.
+		The function takes the molecule names as input.
+		'''
+		fig, maxweight = SimilarityMaps.GetSimilarityMapForFingerprint(self.molecules(refmol), self.molecules(mol),
+						SimilarityMaps.GetMorganFingerprint,
+						metric=DataStructs.TanimotoSimilarity)
+		return fig, maxweight
+
+
+	# def draw_substructure_grid(self):
+	# 	'''
+	# 	'''
+	# 	import io
+	# 	mols = self.molecules()
+	# 	img_size = (150, 150)
 	#
-	# def plotMCS(self, names, smiles, molRows=5, subSize=200):
-	# 	"""
-	# 	Plots a given set of molecules in a grid with their maximum common substructure
-	# 	highlighted in red. The molecules are given as a list of names and a list with
-	# 	the corresponding smiles formats. Optionally, the number of rows in the grid
-	# 	and the size of each subfigure can be specified.
-	# 	"""
-	# 	# make a list of mols
-	# 	ms = [Chem.MolFromSmiles(x) for x in smiles]
+	# 	new_im = Image.new('RGB', (img_size[0]*len(mols), img_size[1]*len(mols)))
 	#
-	# 	# maximum common substructure
-	# 	res = rdFMCS.FindMCS(ms)
-	# 	mcs = Chem.MolFromSmarts(res.smartsString)
-	#
-	# 	# align common structure
-	# 	AllChem.Compute2DCoords(mcs)
-	# 	for m in ms: AllChem.GenerateDepictionMatching2DStructure(m, mcs)
-	#
-	# 	img = Draw.MolsToGridImage(ms, molsPerRow = molRows, \
-	# 		highlightAtomLists = [mol.GetSubstructMatch(mcs) for mol in ms], \
-	# 		subImgSize = (subSize, subSize), legends = names)
-	#
-	# 	img.save('mcs.png')
+	# 	for i, mol1 in enumerate(mols):
+	# 		for j, mol2 in enumerate(mols):
+	# 			fig, maxweight = SimilarityMaps.GetSimilarityMapForFingerprint(mol1, mol2,
+	# 							SimilarityMaps.GetMorganFingerprint,
+	# 							metric=DataStructs.TanimotoSimilarity,
+	# 							size=(50, 50))
 	#
 	#
-	# def draw_substrate_structures(self, SubstratesWSMILES):
-	# 	"""Takes as input a dictionary of substrate names and their SMILES representation, and returns a single .png file containing
-	# 	drawings of all their structures.
-	# 	"""
+	# 			buf = io.BytesIO()
+	# 			fig.savefig(buf, format='png', size=img_size)
+	# 			buf.seek(0)
+	# 			img = Image.open(buf)
 	#
-	# 	name = []    # Initiate list containing names.
-	# 	struct = []  # Initiate list containing mols.
+	# 			box = (img_size[0]*i, img_size[1]*j)
+	# 			new_im.paste(img, box)
+	# 			buf.close()
+	# 			img.close()
 	#
-	# 	for key in SubstratesWSMILES:
-	# 		name.append(key)
-	# 		struct.append(Chem.MolFromSmiles(SubstratesWSMILES[key]))  # Calculate mol from SMILES and append to struct-list.
-	#
-	# 	# Vary row-length according to how many substrates are in dictionary. Modify these values according to preference.
-	# 	if len(SubstratesWSMILES) < 4:
-	# 		rowlength = 3
-	# 	elif len(SubstratesWSMILES) == 4:
-	# 		rowlength = 2
-	# 	else:
-	# 		rowlength = 4
-	#
-	# 	# Draw grid of molecules and their respective legends.
-	# 	img=Draw.MolsToGridImage(struct, molsPerRow = rowlength, subImgSize=(300, 300), legends = name)
-	# 	img.save('SomeECNum.png') # In completed pipeline, suggest to amend this to "img.save(filename + "substrates")"
+	# 	return new_im
+
 
 
 	def cluster_butina(self, cutoff=0.7):
