@@ -3,7 +3,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #LICENSE:
 #
-#colcol is free software; you can redistribute it and/or modify
+#cheminformatics is free software; you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
 #the Free Software Foundation; either version 3 of the License, or
 #(at your option) any later version.
@@ -24,21 +24,19 @@ if sys.version_info[0] == 2:
     sys.exit("Sorry, only Python 3 is supported by this package.")
 
 
-long_description = 'The aim of this package is to easily obtain information regarding growth temperature, growth ph, taxonomy and domain information for uniprot identifiers.'
+long_description = 'The aim of this package is to easily obtain information the properties of small molecules.'
 version = '0.1.0'
 
 setup(
-	name='orgtools',    # This is the name of your PyPI-package.
+	name='cheminformatics',    # This is the name of your PyPI-package.
 	description='A set of scripts to obtain biological descriptions for uniprot identifiers.',       #package description
     long_description=long_description,
     version=version,                          # MAJOR.MINOR.PATCH
 	author='Martin Engqvist',
 	author_email='martin_engqvist@chalmers.se',
-	url='https://github.com/EngqvistLab/orgtools',
+	url='https://github.com/EngqvistLab/cheminformatics',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']), #find folders containing scripts, exclude irrelevant ones
     install_requires=[],
-    include_package_data=True,
-    package_data={'orgtools':['data/ph_data/organism_ph.tsv', 'data/temperature_data/organism_temperature.tsv']},
 	license='GPLv3+',
 	classifiers=[
 	# How mature is this project? Common values are
@@ -64,5 +62,5 @@ setup(
 	'Programming Language :: Python :: 3.5',
 	'Programming Language :: Python :: 3.6'],
     python_requires='>=3', #python version
-    keywords='biology protein phylogeny temperature ph uniprot pfam ncbi'
+    keywords='brenda cheminformatics'
 )
