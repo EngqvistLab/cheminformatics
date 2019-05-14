@@ -21,7 +21,7 @@ from os.path import join, dirname, basename, exists, isdir
 
 import json
 import pandas as pd
-from helpfunctions import clean_name
+from cheminformatics.helpfunctions import clean_name
 
 ### Load environmental variables from the project root directory ###
 # find .env automagically by walking up directories until it's found

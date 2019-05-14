@@ -42,7 +42,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 from sklearn.manifold import TSNE, MDS
 
-from helpfunctions import clean_name
+from cheminformatics.helpfunctions import clean_name
 
 
 class NameToSmile(object):

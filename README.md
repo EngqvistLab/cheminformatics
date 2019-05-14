@@ -9,6 +9,17 @@ Download repository and unzip (alternatively fork or clone), cd to the project b
 pip3 install -e .
 ```
 
+If using an anaconda environment you may have to first locate the anaconda pip using whereis.
+```
+whereis pip
+```
+
+Locate the appropriate file path and run the modified command. For example:
+
+```
+/home/user/anaconda3/envs/py37/bin/pip install -e .
+```
+
 The library should now be available for loading in all your python scripts.
 
 
