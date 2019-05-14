@@ -57,14 +57,13 @@ Initial goals and their status
 Collect all BRENDA data -- **Done, Martin** \
 Split BRENDA file into single EC files -- **Done, Oskar** \
 Extract all unique substrates from a single EC number -- **Done, Martin** \
-Figure out how to filter out co-factors -- **Partially done, Martin** \
+Figure out how to filter out co-factors -- **Done, Martin** \
 Convert substrate names to Smiles/InChi -- **Done, Emma, Rasmus, David** \
 Calculate fingerprints from Smiles/InChi -- **Done, Emma, Rasmus, David** \
 Implement different algorithms for comparing fingerprints \
 ......Kernels -- **In progress, David** \
-......Graph algorithms to find common subgraphs -- **In progress, Isabella** \
-......RDKit -- **In progress, Emma, Rasmus, David** \
-Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **Done, Jonathan**
+......Graph algorithms to find common subgraphs -- **Done, David, Isabella** \
+Visualize the (dis)similarity of substrates within an ec class (t-SNE, subgraphs etc.) -- **In progress, Emma, Rasmus**
 
 
 
@@ -97,29 +96,29 @@ list of two fingerprints -> compute whether common substructure exists in the pa
 list of many fingerprints -> compute whether common substructure exists between all possible pairs
 
 
-visualize common substructure of two molecules
+visualize common substructure of two molecules -- **Done, Jonatan**
 
 
 
 **I also want these scripts to support our work in the lab. There we select a subset of substrates from each EC to test**
-* Given a set of molecules, with m molecules already selected, select one molecule such that it maximizes the chemical diversity in the selection m + n
-* Given a set of molecules, make a selection of n molecules that maximizes the chemical diversity in the selection
+* Given a set of molecules, with m molecules already selected, select one molecule such that it maximizes the chemical diversity in the selection m + n -- **Done, David**
+* Given a set of molecules, make a selection of n molecules that maximizes the chemical diversity in the selection -- **Done, David**
 
 
 
 **Before we can analyze EC number substrate diversity we need to remove molecules that are co-factors in the reaction**
-* For each EC, filter out substrates matching a pre-defined list.
-* On the remainder calculate all pairwise Tanimoto scores.
-* For each molecule calculate the sum of tanimoto scores, the median tanimoto score, the minimum tanimoto score and the maximum tanimoto score.
-* Use the calculated values to flag substrates that are very different from the others. Manual curation will have to follow.
-
+* For each EC, filter out substrates matching a pre-defined list. -- **Done, Martin**
+* On the remainder calculate all pairwise Tanimoto scores. -- **Done, Emma, Rasmus**
+* For each molecule calculate the sum of tanimoto scores, the median tanimoto score, the minimum tanimoto score and the maximum tanimoto score. -- **Done, Emma, Rasmus**
+* Use the calculated values to flag substrates that are very different from the others. Manual curation may have to follow. -- **Not started**
+* Get some "common sense" descriptors for molecules, such as mw, polarity, etc. -- **In progress, Oskar**
 
 
 Final goals and their status
 ------------
 
-Match up the inputs and outputs between the different steps to make a complete pipeline -- **Not started** \
-Add in code to cache partial files and to look for these before starting a new computation -- **Not started** \
+Match up the inputs and outputs between the different steps to make a complete pipeline -- **In progress, Martin** \
+Add in code to cache partial files and to look for these before starting a new computation -- **In progress, Martin** \
 Run pipeline on all of BRENDA -- **Not started** \
 Use visualization tools to explore data, make graphs -- **Not started**
 

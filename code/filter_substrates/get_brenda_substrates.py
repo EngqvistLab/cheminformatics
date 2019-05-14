@@ -61,21 +61,19 @@ if folder_name != '':
 #### Your code here ####
 
 
-from SOAPpy import SOAPProxy ## for usage without WSDL file
+# from SOAPpy import SOAPProxy ## for usage without WSDL file
 import time
 import string
 import hashlib
 import re
 import json
-
-# BRENDA_USERNAME and BRENDA_PASS needs to be registered in the BRENDA website and then added to the .env file of this repository.
-parameters = BRENDA_USERNAME + ',' + hashlib.sha256(BRENDA_PASS).hexdigest()
-
-
-endpointURL = "https://www.brenda-enzymes.org/soap/brenda_server.php"
-client = SOAPProxy(endpointURL)
-
-
+#
+# # BRENDA_USERNAME and BRENDA_PASS needs to be registered in the BRENDA website and then added to the .env file of this repository.
+# parameters = BRENDA_USERNAME + ',' + hashlib.sha256(BRENDA_PASS).hexdigest()
+#
+#
+# endpointURL = "https://www.brenda-enzymes.org/soap/brenda_server.php"
+# client = SOAPProxy(endpointURL)
 
 
 def get_substrates(filepath):
@@ -107,10 +105,6 @@ def get_substrates(filepath):
 
 
 
-
-
-
-
 def get_natural_substrates(filepath):
 	'''
 	Download data regarding the natural substrates for each EC
@@ -136,10 +130,6 @@ def get_natural_substrates(filepath):
 	# save to file
 	with open(filepath, 'w') as outfile:
 		json.dump(data, outfile)
-
-
-
-
 
 
 
@@ -247,13 +237,143 @@ def parse_temp(filepath):
 	return data
 
 
-get_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
 
 
-get_natural_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'natural_substrates_data.txt'))
+def parse_substrates(filepath):
+    """
+    Process the BRENDA data and retain the first molecule named as the main substrate.
+    """
+
+    with open(filepath, 'r') as f:
+        in_data = json.loads(f.read())
+
+    out_data = {}
+    for ec in sorted(in_data.keys()):
+        out_data[ec] = {'first_substrate':set([]), 'other_substrates':set([]), 'first_product':set([]), 'other_products':set([])}
+
+        for entry in in_data[ec].split('!'):
+            for item in entry.split('#'):
+                #print(item)
+
+                if item.startswith(u'reactionPartners'):
+                    reaction = item.replace(u'reactionPartners*', u'')
+
+                    # first attempt to get all substrates and all products separated
+                    try:
+                        reactants, products = reaction.split('=')
+                    except:
+                        reactants = reaction
+                        products = ''
+
+                    # split the reactants
+                    try:
+                        reactant_list = reactants.split(' + ')
+                    except:
+                        reactant_list = reactants
+
+                    # take the first one
+                    out_data[ec]['first_substrate'].add(re.sub('^[0-9]+?[ ]', '', reactant_list[0].strip()))
+
+                    # get the others
+                    out_data[ec]['other_substrates'].update([re.sub('^[0-9]+?[ ]', '', i.strip()) for i in reactant_list[1:]])
 
 
-parse_substrates(join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
+                    # split the products
+                    try:
+                        product_list = products.split(' + ')
+                    except:
+                        product_list = products
+
+                    # take the first one
+                    out_data[ec]['first_product'].add(re.sub('^[0-9]+?[ ]', '', product_list[0].strip()))
+
+                    # get the others
+                    out_data[ec]['other_products'].update([re.sub('^[0-9]+?[ ]', '', i.strip()) for i in product_list[1:]])
+
+
+    # get rid of "more" as a substrate
+    for ec in out_data.keys():
+        for key in out_data[ec].keys():
+            out_data[ec][key] = sorted(list(out_data[ec][key] - set(['more'])))
+
+
+    return out_data
+
+
+def parse_natural_substrates(filepath):
+    """
+    Process the BRENDA data and retain the first molecule named as the main substrate.
+    """
+
+    with open(filepath, 'r') as f:
+        in_data = json.loads(f.read())
+
+    out_data = {}
+    for ec in sorted(in_data.keys()):
+        out_data[ec] = {'first_substrate':set([]), 'other_substrates':set([]), 'first_product':set([]), 'other_products':set([])}
+
+        for entry in in_data[ec].split('!'):
+            for item in entry.split('#'):
+                #print(item)
+
+                if item.startswith(u'naturalReactionPartners'):
+                    reaction = item.replace(u'naturalReactionPartners*', u'')
+
+                    # first attempt to get all substrates and all products separated
+                    try:
+                        reactants, products = reaction.split('=')
+                    except:
+                        reactants = reaction
+                        products = ''
+
+                    # split the reactants
+                    try:
+                        reactant_list = reactants.split(' + ')
+                    except:
+                        reactant_list = reactants
+
+                    # take the first one
+                    out_data[ec]['first_substrate'].add(re.sub('^[0-9]+?[ ]', '', reactant_list[0].strip()))
+
+                    # get the others
+                    out_data[ec]['other_substrates'].update([re.sub('^[0-9]+?[ ]', '', i.strip()) for i in reactant_list[1:]])
+
+
+                    # split the products
+                    try:
+                        product_list = products.split(' + ')
+                    except:
+                        product_list = products
+
+                    # take the first one
+                    out_data[ec]['first_product'].add(re.sub('^[0-9]+?[ ]', '', product_list[0].strip()))
+
+                    # get the others
+                    out_data[ec]['other_products'].update([re.sub('^[0-9]+?[ ]', '', i.strip()) for i in product_list[1:]])
+
+
+    # get rid of "more" as a substrate
+    for ec in out_data.keys():
+        for key in out_data[ec].keys():
+            out_data[ec][key] = sorted(list(out_data[ec][key] - set(['more'])))
+
+
+    return out_data
+#
+# get_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
+#
+#
+# get_natural_substrates(filepath=join(RAW_EXTERNAL, folder_name, 'natural_substrates_data.txt'))
+
+
+subst = parse_substrates(join(RAW_EXTERNAL, folder_name, 'substrates_data.txt'))
+with open(join(INTERMEDIATE, folder_name, 'substrates_filtered.json'), 'w') as f:
+	f.write(json.dumps(subst))
+
+
+nat_subst = parse_natural_substrates(join(RAW_EXTERNAL, folder_name, 'natural_substrates_data.txt'))
+with open(join(INTERMEDIATE, folder_name, 'natural_substrates_filtered.json'), 'w') as f:
+	f.write(json.dumps(nat_subst))
 
 #get_temperature_optima('temp_optima.json')
 #parse_temp('temp_optima.json')
