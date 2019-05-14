@@ -277,10 +277,10 @@ class SmileToData(object):
 
 		self.descriptors = {
 		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m),
-		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m,3),
-		    'morgan5':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m,5),
+		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 3),
+		    'morgan5':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 5),
     		'rdkit':       lambda m: rdmolops.RDKFingerprint(m, fpSize=1024, tgtDensity=0)
-			}
+		}
 
 		self.metrics = {
 		    'asymmetric':    DataStructs.AsymmetricSimilarity,
@@ -419,13 +419,13 @@ class SmileToData(object):
 		Return a list of molecule objects
 		'''
 		if return_only is None:
-			return self.mol_data
+			return self.mol_data.copy()
 		else:
 			assert type(return_only) is str, 'Error, the value in return_only has to be a string.'
 			return_only = clean_name(return_only)
 			assert return_only in self.names(), 'Error, the submitted molecule is not in the original set that was used to initialize the class.'
 			ix = self.names().index(return_only)
-			return self.molecules()[ix]
+			return self.mol_data.copy()[ix]
 
 
 	def fingerprints(self):
