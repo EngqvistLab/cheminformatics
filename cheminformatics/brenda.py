@@ -23,6 +23,8 @@ import json
 import pandas as pd
 from cheminformatics.helpfunctions import clean_name
 
+from pkg_resources import resource_stream, resource_filename, resource_exists
+
 ### Load environmental variables from the project root directory ###
 # find .env automagically by walking up directories until it's found
 dotenv_path = find_dotenv()
@@ -30,8 +32,8 @@ dotenv_path = find_dotenv()
 # load up the entries as environment variables
 load_dotenv(dotenv_path)
 
-NATURAL_MOLS_FILEPATH = join('./data/', 'natural_substrates_filtered.json')
-MOLS_FILEPATH = join('./data/', 'substrates_filtered.json')
+NATURAL_MOLS_FILEPATH = resource_filename(__name__, 'data/natural_substrates_filtered.json')
+MOLS_FILEPATH = resource_filename(__name__, 'data/substrates_filtered.json')
 
 
 

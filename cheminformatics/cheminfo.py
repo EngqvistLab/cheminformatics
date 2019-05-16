@@ -44,6 +44,7 @@ from sklearn.manifold import TSNE, MDS
 
 from cheminformatics.helpfunctions import clean_name
 
+from pkg_resources import resource_stream, resource_filename, resource_exists
 
 class NameToSmile(object):
 	'''
@@ -64,7 +65,7 @@ class NameToSmile(object):
 
 		# setup variables related to the cached file filename
 		self.currentDT = datetime.datetime.now()
-		self.cached_file_dir = './data/'
+		self.cached_file_dir = resource_filename(__name__, 'data')
 		self.fileend = 'substrate_cache.json'
 		self.date = '%s-%s-%s' % (self.currentDT.year, str(self.currentDT.month).rjust(2, '0'), str(self.currentDT.day).rjust(2, '0')) # YY-MM-DD
 		self.todays_filename = join(self.cached_file_dir, '%s_%s' % (self.date, self.fileend))
