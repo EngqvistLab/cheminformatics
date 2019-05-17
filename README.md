@@ -52,7 +52,7 @@ conda install libgcc
 ```
 
 
-Install CIRpy
+Install CIRpy (here you might again need to use the "whereis" trick as outlined above)
 ```
 pip install cirpy
 ```
@@ -74,8 +74,6 @@ Install UMAP-learn
 ```
 conda install -c conda-forge umap-learn
 ```
-
-
 
 
 
