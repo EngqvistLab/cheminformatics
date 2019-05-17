@@ -1,5 +1,5 @@
 # Description of cheminformatics library
-The aim of this package is to easily obtain information the properties of small molecules.
+The aim of this package is to easily obtain information the properties of small molecules. **For example usage please refer to the "package_usage.ipynb" file.**
 
 
 ## Installation
