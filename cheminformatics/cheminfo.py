@@ -41,6 +41,7 @@ from rdkit.ML.Cluster import Butina
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 from sklearn.manifold import TSNE, MDS
+from umap import UMAP
 
 from cheminformatics.helpfunctions import clean_name
 
@@ -716,8 +717,8 @@ class SmileToData(object):
 				plt.text(tsne[:, 0][i]+text_spacing_x, tsne[:, 1][i]+text_spacing_y, txt, fontsize=8)
 
 		plt.title('t-SNE plot, %s components' % n_components)
-		plt.xlabel('DIM1')
-		plt.ylabel('DIM2')
+		plt.xlabel('Dim 1')
+		plt.ylabel('Dim 2')
 
 		return plot
 
@@ -745,8 +746,8 @@ class SmileToData(object):
 				plt.text(pca[:, 0][i]+text_spacing_x, pca[:, 1][i]+text_spacing_y, txt, fontsize=8)
 
 		plt.title('PCA plot, %s components' % n_components)
-		plt.xlabel('PC1')
-		plt.ylabel('PC2')
+		plt.xlabel('PC 1')
+		plt.ylabel('PC 2')
 
 		return plot
 
@@ -774,12 +775,42 @@ class SmileToData(object):
 				plt.text(mds[:, 0][i]+text_spacing_x, mds[:, 1][i]+text_spacing_y, txt, fontsize=8)
 
 		plt.title('MDS plot, %s components' % n_components)
-		plt.xlabel('DIM1')
-		plt.ylabel('DIM2')
+		plt.xlabel('Dim 1')
+		plt.ylabel('Dim 2')
 
 		return plot
 
 
+	def umap(self, include_labels=False, color_categories=None, n_components=2):
+		'''
+		UMAP for dimensionality reduction down to n_components dimensions.
+
+		McInnes et al., (2018). UMAP: Uniform Manifold Approximation and Projection. Journal of Open Source Software, 3(29), 861, https://doi.org/10.21105/joss.00861
+		McInnes, L, Healy, J, UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction, ArXiv e-prints 1802.03426, 2018
+		'''
+		data = self.fingerprints_list()
+		tsne = UMAP(n_components=n_components).fit_transform(data)
+
+		if color_categories is None:
+			plot = plt.scatter(tsne[:, 0], tsne[:, 1])
+		else:
+			plot = plt.scatter(tsne[:, 0], tsne[:, 1], c=color_categories, cmap='rainbow')
+
+		# add text labels if desired
+		if include_labels is True:
+
+			# calculate a reasonable offset for the text
+			text_spacing_x = abs(max(tsne[:, 0])-min(tsne[:, 0]))/50
+			text_spacing_y = abs(max(tsne[:, 1])-min(tsne[:, 1]))/50
+
+			for i, txt in enumerate(self.names()):
+				plt.text(tsne[:, 0][i]+text_spacing_x, tsne[:, 1][i]+text_spacing_y, txt, fontsize=8)
+
+		plt.title('UMAP plot, %s components' % n_components)
+		plt.xlabel('Dim 1')
+		plt.ylabel('Dim 2')
+
+		return plot
 
 
 

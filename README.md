@@ -26,6 +26,14 @@ The library should now be available for loading in all your python scripts.
 ## Requirements
 This library relies on several cheminformatics and machine learning libraries
 
+numpy
+
+pandas
+
+matplotlib
+
+PIL
+
 rdkit
 
 cirpy
