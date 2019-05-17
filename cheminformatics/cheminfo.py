@@ -218,41 +218,41 @@ class NameToSmile(object):
 		pass
 
 
-	def names(self, exclude_none=False):
+	def names(self, exclude_none=True):
 		'''
 		Return a list of the input molecule names.
-		If exclude_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to True all names that don't have a smile will be skipped.
 		'''
-		if exclude_none is True:
+		if exclude_none is False:
 			return self.input_names
 
-		elif exclude_none is False:
+		elif exclude_none is True:
 			return [s for s in self.input_names if self.smile_data[s] is not None]
 
 		else:
 			raise ValueError
 
 
-	def smiles(self, exclude_none=False):
+	def smiles(self, exclude_none=True):
 		'''
 		Return a list of the output molecule smiles.
-		If exclude_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to True all names that don't have a smile will be skipped.
 		'''
 		return [self.smile_data[s] for s in self.names(exclude_none)]
 
 
-	def data_dict(self, exclude_none=False):
+	def data_dict(self, exclude_none=True):
 		'''
 		Return a dictionary with substrate name keys and smile values.
-		If exclude_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to True all names that don't have a smile will be skipped.
 		'''
 		return {k:v for k, v in zip(self.names(exclude_none), self.smiles(exclude_none))}
 
 
-	def data_frame(self, exclude_none=False):
+	def data_frame(self, exclude_none=True):
 		'''
 		Return a dictionary with substrate name keys and smile values.
-		If exclude_none is set to False all names that don't have a smile will be skipped.
+		If exclude_none is set to True all names that don't have a smile will be skipped.
 		'''
 		new_dict = {'molecule':[], 'smile':[]}
 		for mol, smile in zip(self.names(exclude_none), self.smiles(exclude_none)):
@@ -404,7 +404,6 @@ class SmileToData(object):
 	def names(self):
 		'''
 		Return a list of the input molecule names.
-		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
 		return self.input_names
 
@@ -412,7 +411,6 @@ class SmileToData(object):
 	def smiles(self):
 		'''
 		Return a list of the output molecule smiles.
-		If exclude_none is set to False all names that don't have a smile will be skipped.
 		'''
 		return [self.smile_data[s] for s in self.names()]
 
