@@ -646,7 +646,8 @@ class SmileToData(object):
 
 	def cluster_butina(self, cutoff=0.7):
 		'''
-		Generate a vector with
+		Generate a list with cluster belongings.
+		The cutoff variable can be used to specify the clustering threshold.
 		'''
 		# make a linear input file
 		dists = self.distance().values
@@ -663,6 +664,28 @@ class SmileToData(object):
 		for i, clu in enumerate(cluster_data):
 			for member in clu:
 				cluster[member] = i
+
+		return cluster
+
+
+	def cluster_dbscan(self, eps=0.3, min_samples=2):
+		'''
+	    Input: a list containing smiles.
+	    Output: DBSCAN cluster for the molecules, and a list with the smiles of each cluster.
+	    DBSCAN clustering: DBSCAN clustering algorithm from scikit learn is used on the
+	    fingerprint vectors, with Jaccard as the pairwise distance metric.
+	    The different clusters are visualised with different colours in the plot.
+	    The function returns a list,called smile_cluster, containing lists with all the smiles in each cluster.
+	    To achive a good clustering parameters eps and min_sample can be changed to fit the dataset.
+	    Input to DBSCAN:
+	    eps: The maximum distance between two points for them to be considered to belong in the same neighborhood.
+	    min_samples: The number of samples in a neighborhood for a point to be considered as a core point (including the point itself).
+		'''
+		# get the distance matrix
+		data = self.distance()
+
+		# cluster them
+		cluster = DBSCAN(eps=eps, min_samples=min_samples, metric='precomputed').fit(data).labels_.tolist()
 
 		return cluster
 
@@ -693,8 +716,8 @@ class SmileToData(object):
 				plt.text(tsne[:, 0][i]+text_spacing_x, tsne[:, 1][i]+text_spacing_y, txt, fontsize=8)
 
 		plt.title('t-SNE plot, %s components' % n_components)
-		plt.xlabel('PC1')
-		plt.ylabel('PC2')
+		plt.xlabel('DIM1')
+		plt.ylabel('DIM2')
 
 		return plot
 
@@ -751,8 +774,8 @@ class SmileToData(object):
 				plt.text(mds[:, 0][i]+text_spacing_x, mds[:, 1][i]+text_spacing_y, txt, fontsize=8)
 
 		plt.title('MDS plot, %s components' % n_components)
-		plt.xlabel('PC1')
-		plt.ylabel('PC2')
+		plt.xlabel('DIM1')
+		plt.ylabel('DIM2')
 
 		return plot
 
