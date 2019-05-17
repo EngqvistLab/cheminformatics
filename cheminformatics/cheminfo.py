@@ -212,6 +212,8 @@ class NameToSmile(object):
 
 	def _filter_duplicates(self):
 		'''
+		Filter out cases where different molucule names represent the same smiles string.
+		For example, gly and glycine.
 		'''
 		pass
 
@@ -581,9 +583,9 @@ class SmileToData(object):
 		mcs = Chem.MolFromSmarts(res.smartsString)
 
 		# align common structure
-		AllChem.Compute2DCoords(mcs)
-		for m in mols:
-			AllChem.GenerateDepictionMatching2DStructure(m, mcs)
+		# AllChem.Compute2DCoords(mcs)
+		# for m in mols:
+		# 	AllChem.GenerateDepictionMatching2DStructure(m, mcs)
 
 		if highlight_substructure is False:
 			img = Draw.MolsToGridImage(mols, molsPerRow=num_per_row,
