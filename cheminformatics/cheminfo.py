@@ -47,23 +47,12 @@ from cheminformatics.helpfunctions import clean_name
 
 from pkg_resources import resource_stream, resource_filename, resource_exists
 
-class NameToSmile(object):
-	'''
-	Class that makes use of cirpy to get smiles from substrate names.
-	Makes use of caching to save computation.
-	Since the chached file is modified with each new substrate I cache the old files,
-	just in case something gets corrupted.
-	'''
-	def __init__(self, names, retest_none=False):
-		'''
-		Initialize by passing a list of input names.
-		These will be converted to lowercase.
-		'''
-		assert type(names) in [list, set], 'Error, the input must be a list or set'
-		assert all([type(s) is str for s in names]), 'Error, each item in the input list must be a string'
-		self.input_names = [clean_name(s) for s in names if s is not '']
-		self.retest_none = retest_none
 
+class _Data(object):
+	'''
+	Class to handle the cached data.
+	'''
+	def __init__(self):
 		# setup variables related to the cached file filename
 		self.currentDT = datetime.datetime.now()
 		self.cached_file_dir = resource_filename(__name__, 'data')
@@ -73,13 +62,8 @@ class NameToSmile(object):
 
 		# get the most recent cached file and load data
 		self.most_recent_file = self._get_most_recent_filename()
+
 		self.smile_data = self._load_data()
-
-		# get any missing smiles
-		self._get_missing_smiles()
-
-		# remove duplicates
-		self._filter_duplicates()
 
 
 	def _get_most_recent_filename(self):
@@ -149,6 +133,45 @@ class NameToSmile(object):
 	        return data
 
 
+	def get_smile_data(self):
+		'''
+		Return the stored smile data
+		'''
+		return self.smile_data
+
+
+# load up the saved json data
+DATA = _Data()
+
+
+
+class NameToSmile(object):
+	'''
+	Class that makes use of cirpy to get smiles from substrate names.
+	Makes use of caching to save computation.
+	Since the chached file is modified with each new substrate I cache the old files,
+	just in case something gets corrupted.
+	'''
+	def __init__(self, names, retest_none=False):
+		'''
+		Initialize by passing a list of input names.
+		These will be converted to lowercase.
+		'''
+		assert type(names) in [list, set], 'Error, the input must be a list or set'
+		assert all([type(s) is str for s in names]), 'Error, each item in the input list must be a string'
+		self.input_names = [clean_name(s) for s in names if s is not '']
+		self.retest_none = retest_none
+
+
+		self.smile_data = DATA.get_smile_data()
+
+		# get any missing smiles
+		self._get_missing_smiles()
+
+		# remove duplicates
+		self._filter_duplicates()
+
+
 	def _get_missing_smiles(self):
 		'''
 		Use cirpy to obtain smiles for molecules that don't have it
@@ -204,11 +227,11 @@ class NameToSmile(object):
 				continue
 
 			if counter % 100 == 0:
-				self._save_data(self.smile_data)
+				DATA._save_data(self.smile_data)
 				print('%s done' % counter)
 
 		if counter != 1:
-			self._save_data(self.smile_data)
+			DATA._save_data(self.smile_data)
 
 
 	def _filter_duplicates(self):
