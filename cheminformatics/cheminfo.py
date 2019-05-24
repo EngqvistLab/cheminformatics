@@ -292,7 +292,7 @@ class SmileToData(object):
 	A class to convert smiles to usable outputs.
 	These include similarity measures, molecular properties, scatter plots etc.
 	'''
-	def __init__(self, names, smiles, descriptor='morgan3', metric='tanimoto'):
+	def __init__(self, names, smiles, fingerprint='morgan3', metric='tanimoto'):
 		assert type(names) in [list, set], 'Error, the input names must be a list or set'
 		assert all([type(s) is str for s in names]), 'Error, each item in the input list names must be a string'
 		assert type(smiles) in [list, set], 'Error, the input smiles must be a list or set'
@@ -302,7 +302,7 @@ class SmileToData(object):
 		self.input_smiles = smiles
 		self.smile_data = {k:v for k, v in zip(self.input_names, self.input_smiles)}
 
-		self.descriptors = {
+		self.fingerprints = {
 		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m),
 			'atompair':    lambda m: Chem.rdMolDescriptors.GetAtomPairFingerprint(m),
 			'atompairtorsion': lambda m: Chem.rdMolDescriptors.GetTopologicalTorsionFingerprint(m),
@@ -343,16 +343,16 @@ class SmileToData(object):
 		}
 
 
-		assert descriptor in self.descriptors.keys(), 'Error, the argument discriptor must be one of: %s' % ', '.join(self.descriptors.keys())
+		assert fingerprint in self.fingerprints.keys(), 'Error, the argument discriptor must be one of: %s' % ', '.join(self.fingerprints.keys())
 		assert metric in self.metrics.keys(), 'Error, the argument metri must be one of: %s' % ', '.join(self.metrics.keys())
-		self.descriptor = descriptor
+		self.fingerprint = fingerprint
 		self.metric = metric
 
 		# make a list of mols
 		self.mol_data = [Chem.MolFromSmiles(s) for s in self.input_smiles]
 
 		# make a list of fingerprints
-		self.fingerprint_data = [self.descriptors[self.descriptor](s) for s in self.mol_data]
+		self.fingerprint_data = [self.fingerprints[self.fingerprint](s) for s in self.mol_data]
 
 		# compute the similarity matrix
 		self.similarity_matrix = self._compute_similarity_matrix()
@@ -369,7 +369,7 @@ class SmileToData(object):
 		Returns a data frame with pairwise similarity scores for a list of molecules,
 		specified by a list of names and a list of corresponding smiles formats given
 		as input parameters. The fingerprints and similarity coefficients can be chosen
-		from the list of descriptors and metrics (default 'rdkit' and 'tanimoto').
+		from the list of fingerprints and metrics (default 'rdkit' and 'tanimoto').
 		"""
 		# all against all similarity matrix
 		S = []
@@ -418,11 +418,11 @@ class SmileToData(object):
 		return mol_stats
 
 
-	def valid_descriptors(self):
+	def valid_fingerprints(self):
 		'''
-		Return a list of all valid values for descriptors
+		Return a list of all valid values for fingerprints
 		'''
-		return list(self.descriptors.keys())
+		return list(self.fingerprints.keys())
 
 
 	def valid_metrics(self):
