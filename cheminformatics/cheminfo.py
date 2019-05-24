@@ -280,12 +280,17 @@ class SmileToData(object):
 		self.smile_data = {k:v for k, v in zip(self.input_names, self.input_smiles)}
 
 		self.descriptors = {
-		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m
-		    'morgan2':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m,2),
-		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m,3),
-		    'morgan4':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m,5),
-		    'morgan5':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m,5),
-    		'rdkit':       lambda m: rdmolops.RDKFingerprint(m, fpSize=1024, tgtDensity=0)
+		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m),
+			'atompair':    lambda m: Chem.rdMolDescriptors.GetAtomPairFingerprint(m),
+			'atompairtorsion': lambda m: Chem.rdMolDescriptors.GetTopologicalTorsionFingerprint(m),
+			'pattern':     lambda m: rdmolops.PatternFingerprint(m, fpSize=2048),
+			'layered':     lambda m: rdmolops.LayeredFingerprint(m, fpSize=2048),
+		    'morgan2':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 2),
+		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 3),
+		    'morgan4':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 5),
+		    'morgan5':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 5),
+    		'rdkit':       lambda m: rdmolops.RDKFingerprint(m, fpSize=2048, tgtDensity=0)
+			#'unfoldedrdkit': lambda m : DataStructs.cDataStructs.ConvertToExplicit(rdmolops.UnfoldedRDKFingerprintCountBased(m))
 			}
 
 		self.metrics = {
