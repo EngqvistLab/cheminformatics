@@ -302,7 +302,7 @@ class SmileToData(object):
 		self.input_smiles = smiles
 		self.smile_data = {k:v for k, v in zip(self.input_names, self.input_smiles)}
 
-		self.fingerprints = {
+		self.fingerprint_functions = {
 		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m),
 			'atompair':    lambda m: Chem.rdMolDescriptors.GetAtomPairFingerprint(m),
 			'atompairtorsion': lambda m: Chem.rdMolDescriptors.GetTopologicalTorsionFingerprint(m),
@@ -343,7 +343,7 @@ class SmileToData(object):
 		}
 
 
-		assert fingerprint in self.fingerprints.keys(), 'Error, the argument discriptor must be one of: %s' % ', '.join(self.fingerprints.keys())
+		assert fingerprint in self.fingerprint_functions.keys(), 'Error, the argument discriptor must be one of: %s' % ', '.join(self.fingerprint_functions.keys())
 		assert metric in self.metrics.keys(), 'Error, the argument metri must be one of: %s' % ', '.join(self.metrics.keys())
 		self.fingerprint = fingerprint
 		self.metric = metric
@@ -352,7 +352,7 @@ class SmileToData(object):
 		self.mol_data = [Chem.MolFromSmiles(s) for s in self.input_smiles]
 
 		# make a list of fingerprints
-		self.fingerprint_data = [self.fingerprints[self.fingerprint](s) for s in self.mol_data]
+		self.fingerprint_data = [self.fingerprint_functions[self.fingerprint](s) for s in self.mol_data]
 
 		# compute the similarity matrix
 		self.similarity_matrix = self._compute_similarity_matrix()
@@ -422,7 +422,7 @@ class SmileToData(object):
 		'''
 		Return a list of all valid values for fingerprints
 		'''
-		return list(self.fingerprints.keys())
+		return list(self.fingerprint_functions.keys())
 
 
 	def valid_metrics(self):
