@@ -294,7 +294,7 @@ class SmileToData(object):
 			}
 
 		self.metrics = {
-		    'asymmetric':    DataStructs.AsymmetricSimilarity,
+		    #'asymmetric':    DataStructs.AsymmetricSimilarity,
 		    'braunblanquet': DataStructs.BulkBraunBlanquetSimilarity,
 		    'cosine':        DataStructs.BulkCosineSimilarity,
 		    'dice':          DataStructs.BulkDiceSimilarity,
@@ -615,8 +615,9 @@ class SmileToData(object):
 		Compare the structure of two molecules.
 		The function takes the molecule names as input.
 		'''
-		fig, maxweight = SimilarityMaps.GetSimilarityMapForFingerprint(self.molecules(refmol), self.molecules(mol),
-						SimilarityMaps.GetMorganFingerprint,
+		fig, maxweight = SimilarityMaps.GetSimilarityMapForFingerprint(refMol=self.molecules(refmol),
+						probeMol=self.molecules(mol),
+						fpFunction=SimilarityMaps.GetMorganFingerprint,
 						metric=DataStructs.TanimotoSimilarity)
 		return fig, maxweight
 
