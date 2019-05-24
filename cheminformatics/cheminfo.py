@@ -304,10 +304,11 @@ class SmileToData(object):
 
 		self.fingerprint_functions = {
 		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m),
-			'atompair':    lambda m: Chem.rdMolDescriptors.GetAtomPairFingerprint(m),
-			'atompairtorsion': lambda m: Chem.rdMolDescriptors.GetTopologicalTorsionFingerprint(m),
+			'atompair':    lambda m: Chem.rdMolDescriptors.GetAtomPairFingerprintAsBitVect((m),
+			#'atompairtorsion': lambda m: Chem.rdMolDescriptors.GetTopologicalTorsionFingerprint(m),
 			'pattern':     lambda m: rdmolops.PatternFingerprint(m, fpSize=2048),
 			'layered':     lambda m: rdmolops.LayeredFingerprint(m, fpSize=2048),
+			'morgan':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m),
 		    'morgan2':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 2),
 		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 3),
 		    'morgan4':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 5),
@@ -317,7 +318,7 @@ class SmileToData(object):
 			}
 
 		self.metrics = {
-		    #'asymmetric':    DataStructs.AsymmetricSimilarity,
+		    'asymmetric':    DataStructs.BulkAsymmetricSimilarity,
 		    'braunblanquet': DataStructs.BulkBraunBlanquetSimilarity,
 		    'cosine':        DataStructs.BulkCosineSimilarity,
 		    'dice':          DataStructs.BulkDiceSimilarity,
