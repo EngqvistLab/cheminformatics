@@ -152,7 +152,7 @@ class NameToSmile(object):
 	Since the chached file is modified with each new substrate I cache the old files,
 	just in case something gets corrupted.
 	'''
-	def __init__(self, names, retest_none=False):
+	def __init__(self, names, retest_none=False, silent=False):
 		'''
 		Initialize by passing a list of input names.
 		These will be converted to lowercase.
@@ -161,6 +161,7 @@ class NameToSmile(object):
 		assert all([type(s) is str for s in names]), 'Error, each item in the input list must be a string'
 		self.input_names = [clean_name(s) for s in names if s is not '']
 		self.retest_none = retest_none
+		self.silent = silent
 
 
 		self.smile_data = DATA.get_smile_data()
@@ -193,7 +194,7 @@ class NameToSmile(object):
 			else:
 				raise ValueError
 
-		if counter != 0:
+		if counter != 0 and self.silent is False:
 			print('%s name to smile conversions need to be carried out' % counter)
 
 
@@ -228,7 +229,8 @@ class NameToSmile(object):
 
 			if counter % 100 == 0:
 				DATA._save_data(self.smile_data)
-				print('%s done' % counter)
+				if  self.silent is False:
+					print('%s done' % counter)
 
 		if counter != 1:
 			DATA._save_data(self.smile_data)
@@ -599,7 +601,7 @@ class SmileToData(object):
 		return [self.input_names[s] for s in ids]
 
 
-	def draw_structures(self, highlight_substructure=False):
+	def draw_structures(self, highlight_substructure=False, use_svg=True):
 		'''
 		Returns a single .png file containing drawings of all substrate structures.
 		'''
@@ -619,14 +621,16 @@ class SmileToData(object):
 		if highlight_substructure is False:
 			img = Draw.MolsToGridImage(mols, molsPerRow=num_per_row,
 										subImgSize=img_size,
-										legends=self.names())
+										legends=self.names(),
+										useSVG=use_svg)
 			return img
 
 		elif highlight_substructure is True:
 			img = Draw.MolsToGridImage(mols, molsPerRow=num_per_row,
 							highlightAtomLists = [mol.GetSubstructMatch(mcs) for mol in mols],
 							subImgSize=img_size,
-							legends=self.names())
+							legends=self.names(),
+							useSVG=use_svg)
 			return img
 
 		else:
