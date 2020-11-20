@@ -308,13 +308,13 @@ class SmileToData(object):
 		    'maccs':       lambda m: MACCSkeys.GenMACCSKeys(m),
 			#'atompair':    lambda m: Chem.rdMolDescriptors.GetAtomPairFingerprint(m),
 			#'atompairtorsion': lambda m: Chem.rdMolDescriptors.GetTopologicalTorsionFingerprint(m),
-			'pattern':     lambda m: rdmolops.PatternFingerprint(m, fpSize=2048),
-			'layered':     lambda m: rdmolops.LayeredFingerprint(m, fpSize=2048),
-		    'morgan2':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 2, nBits=2048),
-		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 3, nBits=2048),
-		    'morgan4':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 4, nBits=2048),
-		    'morgan5':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 5, nBits=2048),
-    		'rdkit':       lambda m: rdmolops.RDKFingerprint(m, fpSize=2048, tgtDensity=0)
+			'pattern':     lambda m: rdmolops.PatternFingerprint(m, fpSize=1024),
+			'layered':     lambda m: rdmolops.LayeredFingerprint(m, fpSize=1024),
+		    'morgan2':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 2, nBits=1024, useFeatures=True),
+		    'morgan3':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 3, nBits=1024, useFeatures=True),
+		    'morgan4':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 4, nBits=1024, useFeatures=True),
+		    'morgan5':     lambda m: AllChem.GetMorganFingerprintAsBitVect(m, 5, nBits=1024, useFeatures=True),
+    		'rdkit':       lambda m: rdmolops.RDKFingerprint(m, fpSize=1024, tgtDensity=0)
 			#'unfoldedrdkit': lambda m : DataStructs.cDataStructs.ConvertToExplicit(rdmolops.UnfoldedRDKFingerprintCountBased(m))
 			}
 
