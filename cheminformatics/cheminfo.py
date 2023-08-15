@@ -730,9 +730,9 @@ class SmileToData(object):
 		"""
 		tsne on fingerprint data down to n_components dimensions.
 		"""
-		data = self.fingerprints_list()
+		data = np.array(self.fingerprints_list())
 		tsne = TSNE(n_components=n_components,
-				perplexity=perplexity,
+				perplexity=min(perplexity, len(data)-1),
 				learning_rate=learning_rate,
 				n_iter=n_iter).fit_transform(data)
 
@@ -792,7 +792,10 @@ class SmileToData(object):
 		MDS using already computed distance values down to n_components dimensions.
 		'''
 		data = self.distance()
-		mds = MDS(n_components=n_components, dissimilarity='precomputed', random_state=42).fit_transform(data)
+		mds = MDS(n_components=n_components, 
+				dissimilarity='precomputed', 
+				random_state=42,
+				normalized_stress='auto').fit_transform(data)
 
 		if color_categories is None:
 			plot = plt.scatter(mds[:, 0], mds[:, 1])
