@@ -1,0 +1,23 @@
+name: cheminformatics
+
+channels:
+  - conda-forge
+  - rdkit
+  - bioconda
+dependencies:
+  - python=>3.9
+  - numpy
+  - rdkit
+  - cirpy
+  - pubchempy
+  - pandas=2
+  - matplotlib
+  - joblib
+  - jupyter
+  - libgcc
+  - lxml
+  - tqdm
+  - scikit-learn
+  - umap-learn
+  - pillow
+  - python-dotenv

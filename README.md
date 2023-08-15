@@ -3,86 +3,25 @@ The aim of this package is to easily obtain information the properties of small 
 
 
 ## Installation
-Download repository and unzip (alternatively fork or clone), cd to the project base folder and execute the command below:
+The installation instructions below assume that you are using a conda environment as provided by Anaconda (https://www.anaconda.com/). Download repository and unzip (alternatively fork or clone), cd to the project base folder and execute the commands below:
 
+First set up a conda environment and activate.
+
+```bash
+conda env create -f environment.yml
+conda activate cheminformatics
 ```
+
+Then install the cheminformatics package.
+```bash
 pip3 install -e .
-```
-
-If using an anaconda environment you may have to first locate the anaconda pip using whereis.
-```
-whereis pip
-```
-
-Locate the appropriate file path (the one that has anaconda and the correct environment in the filepath) and run the modified command. For example:
-
-```
-/home/username/anaconda3/envs/py37/bin/pip install -e .
 ```
 
 The library should now be available for loading in all your python scripts.
 
 
 ## Requirements
-This library relies on several cheminformatics and machine learning libraries
-
-numpy
-
-pandas
-
-matplotlib
-
-PIL
-
-rdkit
-
-cirpy
-
-pubchempy
-
-umap-learn
-
-scikit-learn
-
-
-The installation instructions below assume that you are using a conda environment as provided by Anaconda (https://www.anaconda.com/).
-
-
-Install rdkit
-```
-conda install -c conda-forge rdkit
-```
-
-
-You may also need to install gcc
-```
-conda install libgcc
-```
-
-
-Install CIRpy (here you might again need to use the "whereis" trick as outlined above)
-```
-pip install cirpy
-```
-
-
-Install PubChemPy
-```
-conda install -c bioconda pubchempy
-```
-
-
-Install SciKit-learn
-```
-conda install scikit-learn
-```
-
-
-Install UMAP-learn
-```
-conda install -c conda-forge umap-learn
-```
-
+This library relies on several cheminformatics and machine learning libraries, including: numpy, pandas, matplotlib, PIL, rdkit, cirpy, pubchempy, umap-learn, scikit-learn
 
 
 ## Documentation for cheminformatics packages
